@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { FiMic, FiMicOff, FiVideo, FiVideoOff, FiCircle } from "react-icons/fi";
 import { ConnectionManager } from "@/lib/webrtc/connection-manager";
-import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 
 interface Participant {
   id: string;
@@ -11,34 +11,80 @@ interface Participant {
   isRecording: boolean;
   isMuted: boolean;
   isVideoOff: boolean;
+  displayName: string;
+  isHost: boolean;
+  isLocal: boolean;
 }
 
-export default function PodcastRoom() {
-  const searchParams = useSearchParams();
-  const roomId = searchParams.get("roomId") || "default-room";
+interface PodcastRoomProps {
+  roomId: string;
+}
+
+export default function PodcastRoom({ roomId }: PodcastRoomProps) {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [isRecording, setIsRecording] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
   const connectionManagerRef = useRef<ConnectionManager | null>(null);
-  const localVideoRef = useRef<HTMLVideoElement>(null);
-  const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
+  const videoRefs = useRef<{ [key: string]: HTMLVideoElement }>({});
+  const localParticipantId = useRef<string>("");
 
   useEffect(() => {
     const initializeRoom = async () => {
       try {
-        // Initialize connection manager
-        const connectionManager = new ConnectionManager(roomId);
-        connectionManagerRef.current = connectionManager;
+        // Get room info
+        const roomInfo = localStorage.getItem("roomInfo");
+        const guestInfo = localStorage.getItem("guestInfo");
 
-        // Set up callbacks
-        connectionManager.setOnTrack((stream, peerId) => {
+        if (!roomInfo) {
+          throw new Error("No room information found");
+        }
+
+        const { isHost } = JSON.parse(roomInfo);
+        const guestData = guestInfo ? JSON.parse(guestInfo) : null;
+
+        // Generate unique local participant ID
+        localParticipantId.current = `local-${Math.random()
+          .toString(36)
+          .substring(2, 9)}`;
+
+        // Initialize connection manager
+        const manager = new ConnectionManager(roomId);
+        connectionManagerRef.current = manager;
+
+        // Set up local media stream
+        const localStream = await manager.initializeLocalStream();
+
+        // Add local participant
+        setParticipants((prev) => {
+          // Remove any existing local participant
+          const others = prev.filter((p) => !p.isLocal);
+          return [
+            ...others,
+            {
+              id: localParticipantId.current,
+              stream: localStream,
+              isRecording: false,
+              isMuted: false,
+              isVideoOff: false,
+              displayName: isHost ? "Host" : guestData?.displayName || "You",
+              isHost,
+              isLocal: true,
+            },
+          ];
+        });
+
+        // Set up track handling
+        manager.setOnTrack((stream, peerId) => {
           console.log("Received track from peer:", peerId);
           setParticipants((prev) => {
+            // Check if participant already exists
             const existing = prev.find((p) => p.id === peerId);
             if (existing) {
               return prev.map((p) => (p.id === peerId ? { ...p, stream } : p));
             }
+
+            // Add new participant
             return [
               ...prev,
               {
@@ -47,87 +93,72 @@ export default function PodcastRoom() {
                 isRecording: false,
                 isMuted: false,
                 isVideoOff: false,
+                displayName: `Participant ${prev.length}`,
+                isHost: false,
+                isLocal: false,
               },
             ];
           });
-
-          // Set up video element for the new stream
-          const videoElement = videoRefs.current.get(peerId);
-          if (videoElement) {
-            videoElement.srcObject = stream;
-          }
         });
-
-        connectionManager.setOnRecordingComplete((blob, peerId) => {
-          // Handle recording completion
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = `recording-${peerId}-${Date.now()}.webm`;
-          a.click();
-          URL.revokeObjectURL(url);
-        });
-
-        // Initialize local stream
-        const localStream = await connectionManager.initializeLocalStream();
-        if (localVideoRef.current) {
-          localVideoRef.current.srcObject = localStream;
-        }
 
         // Start signaling
-        await connectionManager.startSignaling();
+        await manager.startSignaling();
+
+        toast.success("Connected to room");
       } catch (error) {
         console.error("Error initializing room:", error);
+        toast.error("Failed to initialize room");
       }
     };
 
     initializeRoom();
 
     return () => {
+      // Cleanup
       if (connectionManagerRef.current) {
         connectionManagerRef.current.cleanup();
       }
     };
   }, [roomId]);
 
-  // Update video elements when participants change
-  useEffect(() => {
-    participants.forEach((participant) => {
-      const videoElement = videoRefs.current.get(participant.id);
-      if (videoElement && videoElement.srcObject !== participant.stream) {
-        videoElement.srcObject = participant.stream;
-      }
-    });
-  }, [participants]);
-
-  const toggleRecording = async () => {
+  const toggleRecording = () => {
     if (!connectionManagerRef.current) return;
 
     if (!isRecording) {
-      // Start recording for all participants
-      participants.forEach((participant) => {
-        connectionManagerRef.current?.startRecording(participant.id);
-      });
+      connectionManagerRef.current.startRecording(localParticipantId.current);
+      setIsRecording(true);
+      setParticipants((prev) =>
+        prev.map((p) =>
+          p.id === localParticipantId.current ? { ...p, isRecording: true } : p
+        )
+      );
+      toast.success("Recording started");
     } else {
-      // Stop recording for all participants
-      participants.forEach((participant) => {
-        connectionManagerRef.current?.stopRecording(participant.id);
-      });
+      connectionManagerRef.current.stopRecording(localParticipantId.current);
+      setIsRecording(false);
+      setParticipants((prev) =>
+        prev.map((p) =>
+          p.id === localParticipantId.current ? { ...p, isRecording: false } : p
+        )
+      );
+      toast.success("Recording stopped");
     }
-
-    setIsRecording(!isRecording);
   };
 
   const toggleMute = () => {
     if (!connectionManagerRef.current) return;
 
     const localStream = connectionManagerRef.current.getLocalStream();
-    if (!localStream) return;
-
-    const audioTrack = localStream.getAudioTracks()[0];
-    if (audioTrack) {
-      audioTrack.enabled = !audioTrack.enabled;
+    if (localStream) {
+      localStream.getAudioTracks().forEach((track) => {
+        track.enabled = isMuted;
+      });
       setIsMuted(!isMuted);
+      setParticipants((prev) =>
+        prev.map((p) =>
+          p.id === localParticipantId.current ? { ...p, isMuted: !isMuted } : p
+        )
+      );
     }
   };
 
@@ -135,94 +166,106 @@ export default function PodcastRoom() {
     if (!connectionManagerRef.current) return;
 
     const localStream = connectionManagerRef.current.getLocalStream();
-    if (!localStream) return;
-
-    const videoTrack = localStream.getVideoTracks()[0];
-    if (videoTrack) {
-      videoTrack.enabled = !videoTrack.enabled;
+    if (localStream) {
+      localStream.getVideoTracks().forEach((track) => {
+        track.enabled = isVideoOff;
+      });
       setIsVideoOff(!isVideoOff);
+      setParticipants((prev) =>
+        prev.map((p) =>
+          p.id === localParticipantId.current
+            ? { ...p, isVideoOff: !isVideoOff }
+            : p
+        )
+      );
     }
   };
 
-  const setVideoRef = (
-    element: HTMLVideoElement | null,
-    participantId: string
-  ) => {
+  const setVideoRef = (id: string, element: HTMLVideoElement | null) => {
     if (element) {
-      videoRefs.current.set(participantId, element);
-      // Set the stream if it exists
-      const participant = participants.find((p) => p.id === participantId);
+      videoRefs.current[id] = element;
+      const participant = participants.find((p) => p.id === id);
       if (participant) {
         element.srcObject = participant.stream;
       }
-    } else {
-      videoRefs.current.delete(participantId);
     }
   };
 
-  return (
-    <div className="flex flex-col h-full">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 flex-grow">
-        {/* Local video */}
-        <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
-          <video
-            ref={localVideoRef}
-            autoPlay
-            playsInline
-            muted
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute bottom-2 left-2 text-white text-sm">
-            You {isMuted && "(Muted)"} {isVideoOff && "(Camera Off)"}
-          </div>
-        </div>
+  // Sort participants: local first, then hosts, then others
+  const sortedParticipants = [...participants].sort((a, b) => {
+    if (a.isLocal) return -1;
+    if (b.isLocal) return 1;
+    if (a.isHost && !b.isHost) return -1;
+    if (!a.isHost && b.isHost) return 1;
+    return 0;
+  });
 
-        {/* Remote videos */}
-        {participants.map((participant) => (
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {sortedParticipants.map((participant) => (
           <div
             key={participant.id}
-            className="relative aspect-video bg-black rounded-lg overflow-hidden"
+            className="relative aspect-video bg-gray-900 rounded-lg overflow-hidden"
           >
             <video
-              ref={(el) => setVideoRef(el, participant.id)}
+              ref={(el) => setVideoRef(participant.id, el)}
               autoPlay
               playsInline
+              muted={participant.isLocal}
               className="w-full h-full object-cover"
             />
-            <div className="absolute bottom-2 left-2 text-white text-sm">
-              Participant {participant.id.slice(0, 4)}{" "}
-              {participant.isMuted && "(Muted)"}{" "}
-              {participant.isVideoOff && "(Camera Off)"}
+            <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/50 to-transparent">
+              <div className="flex items-center gap-2">
+                <p className="text-white text-sm">{participant.displayName}</p>
+                {participant.isHost && (
+                  <span className="px-2 py-0.5 bg-blue-500 text-white text-xs rounded-full">
+                    Host
+                  </span>
+                )}
+                {participant.isMuted && (
+                  <span className="px-2 py-0.5 bg-red-500 text-white text-xs rounded-full">
+                    Muted
+                  </span>
+                )}
+              </div>
             </div>
+            {participant.isRecording && (
+              <div className="absolute top-2 right-2">
+                <div className="flex items-center gap-1 bg-red-500 text-white px-2 py-1 rounded-full text-xs">
+                  <FiCircle className="animate-pulse" />
+                  REC
+                </div>
+              </div>
+            )}
           </div>
         ))}
       </div>
 
-      {/* Controls */}
-      <div className="flex justify-center items-center gap-4 p-4 bg-gray-900">
+      <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex items-center gap-4 bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg">
         <button
           onClick={toggleMute}
           className={`p-3 rounded-full ${
-            isMuted ? "bg-red-500" : "bg-gray-700"
-          } text-white hover:bg-opacity-80 transition-colors`}
+            isMuted ? "bg-red-500 text-white" : "bg-gray-200"
+          }`}
         >
-          {isMuted ? <FiMicOff size={24} /> : <FiMic size={24} />}
+          {isMuted ? <FiMicOff /> : <FiMic />}
         </button>
         <button
           onClick={toggleVideo}
           className={`p-3 rounded-full ${
-            isVideoOff ? "bg-red-500" : "bg-gray-700"
-          } text-white hover:bg-opacity-80 transition-colors`}
+            isVideoOff ? "bg-red-500 text-white" : "bg-gray-200"
+          }`}
         >
-          {isVideoOff ? <FiVideoOff size={24} /> : <FiVideo size={24} />}
+          {isVideoOff ? <FiVideoOff /> : <FiVideo />}
         </button>
         <button
           onClick={toggleRecording}
           className={`p-3 rounded-full ${
-            isRecording ? "bg-red-500" : "bg-gray-700"
-          } text-white hover:bg-opacity-80 transition-colors`}
+            isRecording ? "bg-red-500 text-white" : "bg-gray-200"
+          }`}
         >
-          <FiCircle size={24} />
+          <FiCircle />
         </button>
       </div>
     </div>

@@ -1,21 +1,18 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import PodcastRoom from "../components/podcast-room";
+import PodcastRoom from "@/app/(studio)/studio/components/podcast-room";
 import { toast } from "sonner";
-import { FiCopy, FiLink } from "react-icons/fi";
 import { use } from "react";
 
 interface PageProps {
   params: Promise<{ roomId: string }>;
 }
 
-export default function PodcastPage({ params }: PageProps) {
+export default function RoomPage({ params }: PageProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [roomId, setRoomId] = useState<string | null>(null);
-  const [inviteLink, setInviteLink] = useState<string>("");
   const resolvedParams = use(params);
 
   useEffect(() => {
@@ -27,8 +24,12 @@ export default function PodcastPage({ params }: PageProps) {
           throw new Error("No room information found");
         }
 
-        const { inviteId } = JSON.parse(roomInfo);
-        setInviteLink(`${window.location.origin}/studio/join/${inviteId}`);
+        const { roomId, inviteId } = JSON.parse(roomInfo);
+
+        // Validate that the room ID matches
+        if (roomId !== resolvedParams.roomId) {
+          throw new Error("Invalid room access");
+        }
 
         // Validate room on server
         const response = await fetch(`/api/webrtc/room/${inviteId}`);
@@ -36,8 +37,6 @@ export default function PodcastPage({ params }: PageProps) {
           throw new Error("Invalid room");
         }
 
-        const data = await response.json();
-        setRoomId(data.roomId);
         setIsLoading(false);
       } catch (error) {
         console.error("Room validation error:", error);
@@ -51,16 +50,7 @@ export default function PodcastPage({ params }: PageProps) {
     };
 
     validateRoom();
-  }, [router]);
-
-  const copyInviteLink = async () => {
-    try {
-      await navigator.clipboard.writeText(inviteLink);
-      toast.success("Invite link copied to clipboard");
-    } catch (err) {
-      toast.error("Failed to copy invite link");
-    }
-  };
+  }, [router, resolvedParams.roomId]);
 
   if (isLoading) {
     return (
@@ -84,36 +74,9 @@ export default function PodcastPage({ params }: PageProps) {
     );
   }
 
-  if (!roomId) {
-    return null;
-  }
-
   return (
     <div className="h-screen bg-gray-900">
-      <div className="absolute top-4 right-4 z-10">
-        <div className="bg-gray-800 rounded-lg p-4 shadow-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <FiLink className="text-blue-500" />
-            <h3 className="text-white font-medium">Invite Link</h3>
-          </div>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={inviteLink}
-              readOnly
-              className="bg-gray-700 text-white px-3 py-2 rounded text-sm w-64"
-            />
-            <button
-              onClick={copyInviteLink}
-              className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded"
-              title="Copy invite link"
-            >
-              <FiCopy />
-            </button>
-          </div>
-        </div>
-      </div>
-      <PodcastRoom roomId={roomId} />
+      <PodcastRoom roomId={resolvedParams.roomId} />
     </div>
   );
 }

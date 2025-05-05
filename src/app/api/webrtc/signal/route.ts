@@ -2,97 +2,53 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-// In-memory store for signaling data with TTL
-interface SignalingData {
-  type: string;
-  data: any;
-  timestamp: number;
-  ttl: number;
-}
-
-const rooms = new Map<string, Map<string, SignalingData>>();
-const ROOM_TTL = 1000 * 60 * 60; // 1 hour
-const DATA_TTL = 1000 * 30; // 30 seconds
+// In-memory store for signaling data
+const signalingData = new Map<string, any[]>();
 
 // Cleanup function to remove stale data
-function cleanupStaleData() {
+const cleanupStaleData = () => {
   const now = Date.now();
-
-  for (const [roomId, room] of rooms.entries()) {
-    // Clean up stale peer data
-    for (const [peerId, data] of room.entries()) {
-      if (now - data.timestamp > data.ttl) {
-        room.delete(peerId);
-      }
-    }
-
-    // Remove empty rooms
-    if (room.size === 0) {
-      rooms.delete(roomId);
+  for (const [roomId, messages] of signalingData.entries()) {
+    const filteredMessages = messages.filter(
+      (msg) => now - msg.timestamp < 30000 // 30 seconds TTL
+    );
+    if (filteredMessages.length === 0) {
+      signalingData.delete(roomId);
+    } else {
+      signalingData.set(roomId, filteredMessages);
     }
   }
-}
+};
 
 // Run cleanup every minute
 setInterval(cleanupStaleData, 60000);
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const data = await request.json();
+    console.log("Received POST request:", data);
 
-    const { roomId, type, data, from, to } = await req.json();
-
-    if (!roomId || !type || !data || !from) {
+    if (!data.roomId || !data.type || !data.from) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
       );
     }
 
-    // Get or create room
-    if (!rooms.has(roomId)) {
-      rooms.set(roomId, new Map());
-    }
-    const room = rooms.get(roomId)!;
-
-    // Store the signaling data with TTL
-    room.set(from, {
-      type,
-      data,
+    const message = {
+      ...data,
       timestamp: Date.now(),
-      ttl: type === "ice-candidate" ? DATA_TTL : ROOM_TTL,
-    });
+    };
 
-    // If this is a targeted message, only send to the specific peer
-    if (to) {
-      const targetData = room.get(to);
-      if (targetData) {
-        return NextResponse.json({
-          type: targetData.type,
-          data: targetData.data,
-          from: to,
-        });
-      }
-    }
+    // Store the message
+    const roomMessages = signalingData.get(data.roomId) || [];
+    roomMessages.push(message);
+    signalingData.set(data.roomId, roomMessages);
 
-    // For broadcast messages, return only recent peers' data
-    const now = Date.now();
-    const peers = Array.from(room.entries())
-      .filter(
-        ([peerId, data]) => peerId !== from && now - data.timestamp <= data.ttl
-      )
-      .map(([peerId, data]) => ({
-        type: data.type,
-        data: data.data,
-        from: peerId,
-      }));
-
-    return NextResponse.json({ peers });
+    console.log("Stored message for room:", data.roomId);
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error in signaling:", error);
+    console.error("Error in POST /api/webrtc/signal:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -100,67 +56,29 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET(req: Request) {
+export async function GET(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const { searchParams } = new URL(req.url);
+    const { searchParams } = new URL(request.url);
     const roomId = searchParams.get("roomId");
-    const from = searchParams.get("from");
-    const to = searchParams.get("to");
-    const lastTimestamp = searchParams.get("lastTimestamp");
 
-    if (!roomId || !from) {
+    console.log("Received GET request for room:", roomId);
+
+    if (!roomId) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Room ID is required" },
         { status: 400 }
       );
     }
 
-    const room = rooms.get(roomId);
-    if (!room) {
-      return NextResponse.json({ peers: [] });
-    }
+    const messages = signalingData.get(roomId) || [];
+    console.log("Found messages for room:", roomId, messages.length);
 
-    // If this is a targeted message, only return data for the specific peer
-    if (to) {
-      const targetData = room.get(to);
-      if (targetData) {
-        return NextResponse.json({
-          type: targetData.type,
-          data: targetData.data,
-          from: to,
-        });
-      }
-      return NextResponse.json({});
-    }
+    // Clear messages after sending them
+    signalingData.set(roomId, []);
 
-    // For broadcast messages, return only new data since last timestamp
-    const now = Date.now();
-    const lastTime = lastTimestamp ? parseInt(lastTimestamp) : 0;
-
-    const peers = Array.from(room.entries())
-      .filter(
-        ([peerId, data]) =>
-          peerId !== from &&
-          now - data.timestamp <= data.ttl &&
-          data.timestamp > lastTime
-      )
-      .map(([peerId, data]) => ({
-        type: data.type,
-        data: data.data,
-        from: peerId,
-      }));
-
-    return NextResponse.json({
-      peers,
-      timestamp: now,
-    });
+    return NextResponse.json(messages);
   } catch (error) {
-    console.error("Error in signaling:", error);
+    console.error("Error in GET /api/webrtc/signal:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
