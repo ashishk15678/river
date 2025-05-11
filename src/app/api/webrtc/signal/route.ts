@@ -1,52 +1,120 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { Prisma } from "@prisma/client";
 
-// In-memory store for signaling data
-const signalingData = new Map<string, any[]>();
+// Define enums to match Prisma schema
+enum Role {
+  HOST = "HOST",
+  GUEST = "GUEST",
+  WATCHER = "WATCHER",
+}
 
-// Cleanup function to remove stale data
-const cleanupStaleData = () => {
-  const now = Date.now();
-  for (const [roomId, messages] of signalingData.entries()) {
-    const filteredMessages = messages.filter(
-      (msg) => now - msg.timestamp < 30000 // 30 seconds TTL
-    );
-    if (filteredMessages.length === 0) {
-      signalingData.delete(roomId);
-    } else {
-      signalingData.set(roomId, filteredMessages);
-    }
-  }
-};
+type MessageType =
+  | "OFFER"
+  | "ANSWER"
+  | "ICE_CANDIDATE"
+  | "JOIN"
+  | "LEAVE"
+  | "MUTE"
+  | "UNMUTE"
+  | "VIDEO_ON"
+  | "VIDEO_OFF";
 
-// Run cleanup every minute
-setInterval(cleanupStaleData, 60000);
+interface SignalingMessage {
+  type: MessageType;
+  roomId: string;
+  fromId: string;
+  toId?: string;
+  data: {
+    offer?: RTCSessionDescriptionInit;
+    answer?: RTCSessionDescriptionInit;
+    candidate?: RTCIceCandidateInit;
+    error?: string;
+  };
+}
 
 export async function POST(request: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const data = await request.json();
     console.log("Received POST request:", data);
 
-    if (!data.roomId || !data.type || !data.from) {
+    if (!data.roomId || !data.type) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
       );
     }
 
-    const message = {
-      ...data,
-      timestamp: Date.now(),
-    };
+    // Verify room exists
+    const room = await prisma.room.findUnique({
+      where: { id: data.roomId },
+      include: {
+        participants: true,
+      },
+    });
 
-    // Store the message
-    const roomMessages = signalingData.get(data.roomId) || [];
-    roomMessages.push(message);
-    signalingData.set(data.roomId, roomMessages);
+    if (!room) {
+      return NextResponse.json({ error: "Room not found" }, { status: 404 });
+    }
 
-    console.log("Stored message for room:", data.roomId);
-    return NextResponse.json({ success: true });
+    // Determine if this is the first participant (host)
+    const isFirstParticipant = room.participants.length === 0;
+
+    // Create or get participant
+    const participant = await prisma.participant.upsert({
+      where: {
+        userId_roomId: {
+          userId: session.user.id,
+          roomId: data.roomId,
+        },
+      },
+      create: {
+        userId: session.user.id,
+        roomId: data.roomId,
+        role: isFirstParticipant ? Role.HOST : Role.GUEST,
+      },
+      update: {
+        // Update leftAt to null if participant is rejoining
+        leftAt: null,
+      },
+    });
+
+    // For JOIN messages, just return the participant info
+    if (data.type === "JOIN") {
+      return NextResponse.json({
+        success: true,
+        message: {
+          fromId: participant.id,
+          type: "JOIN",
+          role: participant.role,
+        },
+      });
+    }
+
+    // Create signaling message
+    const message = await prisma.signalingMessage.create({
+      data: {
+        type: data.type as MessageType,
+        roomId: data.roomId,
+        fromId: participant.id,
+        toId: data.toId || null,
+        data: {
+          offer: data.offer,
+          answer: data.answer,
+          candidate: data.candidate,
+        },
+      },
+    });
+
+    console.log("Created signaling message:", message);
+    return NextResponse.json({ success: true, message });
   } catch (error) {
     console.error("Error in POST /api/webrtc/signal:", error);
     return NextResponse.json(
@@ -58,10 +126,13 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const roomId = searchParams.get("roomId");
-
-    console.log("Received GET request for room:", roomId);
 
     if (!roomId) {
       return NextResponse.json(
@@ -70,12 +141,65 @@ export async function GET(request: Request) {
       );
     }
 
-    const messages = signalingData.get(roomId) || [];
-    console.log("Found messages for room:", roomId, messages.length);
+    // Get participant
+    const participant = await prisma.participant.findUnique({
+      where: {
+        userId_roomId: {
+          userId: session.user.id,
+          roomId,
+        },
+      },
+    });
 
-    // Clear messages after sending them
-    signalingData.set(roomId, []);
+    if (!participant) {
+      return NextResponse.json(
+        { error: "Participant not found" },
+        { status: 404 }
+      );
+    }
 
+    // Get unprocessed messages
+    const messages = await prisma.signalingMessage.findMany({
+      where: {
+        roomId,
+        processed: false,
+        OR: [
+          { toId: null }, // Broadcast messages
+          { toId: participant.id }, // Messages targeted to this participant
+        ],
+      },
+      orderBy: {
+        createdAt: "asc",
+      },
+      include: {
+        from: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                image: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Mark messages as processed
+    if (messages.length > 0) {
+      await prisma.signalingMessage.updateMany({
+        where: {
+          id: {
+            in: messages.map((m) => m.id),
+          },
+        },
+        data: {
+          processed: true,
+        },
+      });
+    }
+
+    console.log("Returning messages:", messages);
     return NextResponse.json(messages);
   } catch (error) {
     console.error("Error in GET /api/webrtc/signal:", error);

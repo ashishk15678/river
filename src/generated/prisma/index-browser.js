@@ -158,17 +158,42 @@ exports.Prisma.VerificationTokenScalarFieldEnum = {
   expires: 'expires'
 };
 
-exports.Prisma.PodcastScalarFieldEnum = {
+exports.Prisma.RoomScalarFieldEnum = {
   id: 'id',
   title: 'title',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
+  status: 'status',
   userId: 'userId'
+};
+
+exports.Prisma.ParticipantScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  roomId: 'roomId',
+  role: 'role',
+  joinedAt: 'joinedAt',
+  leftAt: 'leftAt'
+};
+
+exports.Prisma.SignalingMessageScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  roomId: 'roomId',
+  fromId: 'fromId',
+  toId: 'toId',
+  data: 'data',
+  createdAt: 'createdAt',
+  processed: 'processed'
 };
 
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -181,13 +206,42 @@ exports.Prisma.NullsOrder = {
   last: 'last'
 };
 
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
+exports.RoomStatus = exports.$Enums.RoomStatus = {
+  ACTIVE: 'ACTIVE',
+  ENDED: 'ENDED'
+};
+
+exports.Role = exports.$Enums.Role = {
+  HOST: 'HOST',
+  GUEST: 'GUEST',
+  WATCHER: 'WATCHER'
+};
+
+exports.MessageType = exports.$Enums.MessageType = {
+  OFFER: 'OFFER',
+  ANSWER: 'ANSWER',
+  ICE_CANDIDATE: 'ICE_CANDIDATE',
+  JOIN: 'JOIN',
+  LEAVE: 'LEAVE',
+  MUTE: 'MUTE',
+  UNMUTE: 'UNMUTE',
+  VIDEO_ON: 'VIDEO_ON',
+  VIDEO_OFF: 'VIDEO_OFF'
+};
 
 exports.Prisma.ModelName = {
   Account: 'Account',
   Session: 'Session',
   User: 'User',
   VerificationToken: 'VerificationToken',
-  Podcast: 'Podcast'
+  Room: 'Room',
+  Participant: 'Participant',
+  SignalingMessage: 'SignalingMessage'
 };
 
 /**

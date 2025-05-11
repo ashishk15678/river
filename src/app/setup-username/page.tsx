@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { FiUser } from "react-icons/fi";
+import { BiLogOut } from "react-icons/bi";
 
 export default function SetupUsernamePage() {
   const router = useRouter();
@@ -53,6 +54,12 @@ export default function SetupUsernamePage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <button
+        onClick={() => signOut()}
+        className="absolute top-4 right-4 bg-zinc-100 text-zinc-600 shadow-sm px-4 py-2 rounded-md flex items-center gap-2"
+      >
+        Sign Out <BiLogOut />
+      </button>
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">

@@ -6,31 +6,152 @@ interface PeerConnection {
   mediaStream: MediaStream | null;
   recorder: MediaRecorder | null;
   recordedChunks: Blob[];
+  displayName: string;
+  lastActivity: number;
+  reconnectAttempts: number;
+  isReconnecting: boolean;
+}
+
+interface SignalingMessage {
+  id: string;
+  type: "OFFER" | "ANSWER" | "ICE_CANDIDATE" | "JOIN" | "LEAVE" | "ERROR";
+  fromId: string;
+  toId: string | null;
+  data: {
+    offer?: RTCSessionDescriptionInit;
+    answer?: RTCSessionDescriptionInit;
+    candidate?: RTCIceCandidateInit;
+    error?: string;
+  };
+  from: {
+    user: {
+      name: string | null;
+      image: string | null;
+    };
+  };
+}
+
+interface IceServer {
+  urls: string;
+  username?: string;
+  credential?: string;
+}
+
+interface ConnectionState {
+  isConnected: boolean;
+  isReconnecting: boolean;
+  error: string | null;
+  stats: {
+    bytesReceived: number;
+    bytesSent: number;
+    packetsLost: number;
+    roundTripTime: number;
+  };
 }
 
 export class ConnectionManager {
   private roomId: string;
+  private participantId: string | null = null;
   private localStream: MediaStream | null = null;
   private peers: Map<string, PeerConnection> = new Map();
   private onTrackCallback:
-    | ((stream: MediaStream, peerId: string) => void)
+    | ((stream: MediaStream, peerId: string, displayName: string) => void)
+    | null = null;
+  private onConnectionStateChange:
+    | ((peerId: string, state: ConnectionState) => void)
     | null = null;
   private signalingInterval: NodeJS.Timeout | null = null;
+  private statsInterval: NodeJS.Timeout | null = null;
+  private maxReconnectAttempts = 5;
+  private reconnectDelay = 2000;
+  private iceServers: IceServer[] = [
+    // Public STUN servers
+    { urls: "stun:stun.l.google.com:19302" },
+    { urls: "stun:stun1.l.google.com:19302" },
+    { urls: "stun:stun2.l.google.com:19302" },
+    { urls: "stun:stun3.l.google.com:19302" },
+    { urls: "stun:stun4.l.google.com:19302" },
+    { urls: "stun:stun.ekiga.net" },
+    { urls: "stun:stun.ideasip.com" },
+    { urls: "stun:stun.schlund.de" },
+    { urls: "stun:stun.stunprotocol.org:3478" },
+    { urls: "stun:stun.voiparound.com" },
+    { urls: "stun:stun.voipbuster.com" },
+    { urls: "stun:stun.voipstunt.com" },
+    { urls: "stun:stun.voxgratia.org" },
+  ];
 
   constructor(roomId: string) {
     this.roomId = roomId;
   }
 
+  setOnTrack(
+    callback: (stream: MediaStream, peerId: string, displayName: string) => void
+  ) {
+    this.onTrackCallback = callback;
+  }
+
+  setOnConnectionStateChange(
+    callback: (peerId: string, state: ConnectionState) => void
+  ) {
+    this.onConnectionStateChange = callback;
+  }
+
   async initializeLocalStream(): Promise<MediaStream> {
     try {
-      this.localStream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
+      // Try to get both audio and video
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          frameRate: { ideal: 30 },
+        },
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
       });
-      return this.localStream;
+      this.localStream = stream;
+      return stream;
     } catch (error) {
-      console.error("Error accessing media devices:", error);
-      throw new Error("Failed to access camera and microphone");
+      console.log(
+        "Failed to get both audio and video, trying audio only:",
+        error
+      );
+      try {
+        // Try audio only
+        const audioStream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+          },
+          video: false,
+        });
+        this.localStream = audioStream;
+        return audioStream;
+      } catch (audioError) {
+        console.log("Failed to get audio, trying video only:", audioError);
+        try {
+          // Try video only
+          const videoStream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              width: { ideal: 1280 },
+              height: { ideal: 720 },
+              frameRate: { ideal: 30 },
+            },
+            audio: false,
+          });
+          this.localStream = videoStream;
+          return videoStream;
+        } catch (videoError) {
+          console.log("Failed to get any media devices:", videoError);
+          // Return an empty stream if no permissions are granted
+          this.localStream = new MediaStream();
+          return this.localStream;
+        }
+      }
     }
   }
 
@@ -38,16 +159,13 @@ export class ConnectionManager {
     return this.localStream;
   }
 
-  setOnTrack(callback: (stream: MediaStream, peerId: string) => void) {
-    this.onTrackCallback = callback;
-  }
-
   private createPeerConnection(peerId: string): RTCPeerConnection {
-    const configuration = {
-      iceServers: [
-        { urls: "stun:stun.l.google.com:19302" },
-        { urls: "stun:stun1.l.google.com:19302" },
-      ],
+    const configuration: RTCConfiguration = {
+      iceServers: this.iceServers,
+      iceCandidatePoolSize: 10,
+      bundlePolicy: "max-bundle",
+      rtcpMuxPolicy: "require",
+      iceTransportPolicy: "all",
     };
 
     const connection = new RTCPeerConnection(configuration);
@@ -63,19 +181,35 @@ export class ConnectionManager {
     connection.ontrack = (event) => {
       console.log("Received track from peer:", peerId);
       if (this.onTrackCallback) {
-        this.onTrackCallback(event.streams[0], peerId);
+        const peer = this.peers.get(peerId);
+        this.onTrackCallback(
+          event.streams[0],
+          peerId,
+          peer?.displayName || "Unknown"
+        );
       }
     };
 
     // Handle ICE candidates
     connection.onicecandidate = (event) => {
       if (event.candidate) {
+        console.log("New ICE candidate:", event.candidate);
         this.sendSignalingMessage({
-          type: "candidate",
-          from: this.roomId,
-          to: peerId,
+          type: "ICE_CANDIDATE",
           candidate: event.candidate,
         });
+      }
+    };
+
+    // Handle ICE connection state changes
+    connection.oniceconnectionstatechange = () => {
+      console.log(
+        `ICE connection state with ${peerId}:`,
+        connection.iceConnectionState
+      );
+      if (connection.iceConnectionState === "failed") {
+        console.log("ICE connection failed, attempting to restart...");
+        this.restartIce(peerId);
       }
     };
 
@@ -85,26 +219,146 @@ export class ConnectionManager {
         `Connection state with ${peerId}:`,
         connection.connectionState
       );
+      const peer = this.peers.get(peerId);
+      if (!peer) return;
+
       if (connection.connectionState === "failed") {
+        console.log("Connection failed, attempting to reconnect...");
         this.cleanupPeer(peerId);
+        // Try to reconnect after a short delay
+        setTimeout(() => {
+          this.reconnectPeer(peerId);
+        }, this.reconnectDelay);
+      }
+
+      // Update connection state
+      if (this.onConnectionStateChange) {
+        this.onConnectionStateChange(peerId, {
+          isConnected: connection.connectionState === "connected",
+          isReconnecting: peer.isReconnecting,
+          error:
+            connection.connectionState === "failed"
+              ? "Connection failed"
+              : null,
+          stats: {
+            bytesReceived: 0,
+            bytesSent: 0,
+            packetsLost: 0,
+            roundTripTime: 0,
+          },
+        });
+      }
+    };
+
+    // Handle ICE gathering state changes
+    connection.onicegatheringstatechange = () => {
+      console.log(
+        `ICE gathering state with ${peerId}:`,
+        connection.iceGatheringState
+      );
+    };
+
+    // Handle negotiation needed
+    connection.onnegotiationneeded = async () => {
+      try {
+        const offer = await connection.createOffer();
+        await connection.setLocalDescription(offer);
+        await this.sendSignalingMessage({
+          type: "OFFER",
+          offer,
+          toId: peerId,
+        });
+      } catch (error) {
+        console.error("Error during negotiation:", error);
       }
     };
 
     return connection;
   }
 
-  private async handleOffer(offer: RTCSessionDescriptionInit, from: string) {
-    console.log("Handling offer from:", from);
-    let peerConnection = this.peers.get(from)?.connection;
+  private async restartIce(peerId: string) {
+    const peer = this.peers.get(peerId);
+    if (!peer) return;
+
+    try {
+      const offer = await peer.connection.createOffer({ iceRestart: true });
+      await peer.connection.setLocalDescription(offer);
+      await this.sendSignalingMessage({
+        type: "OFFER",
+        offer,
+        toId: peerId,
+      });
+    } catch (error) {
+      console.error("Error restarting ICE:", error);
+    }
+  }
+
+  private async reconnectPeer(peerId: string) {
+    console.log("Attempting to reconnect peer:", peerId);
+    const peer = this.peers.get(peerId);
+    if (!peer) return;
+
+    if (peer.reconnectAttempts >= this.maxReconnectAttempts) {
+      console.log("Max reconnection attempts reached");
+      if (this.onConnectionStateChange) {
+        this.onConnectionStateChange(peerId, {
+          isConnected: false,
+          isReconnecting: false,
+          error: "Max reconnection attempts reached",
+          stats: {
+            bytesReceived: 0,
+            bytesSent: 0,
+            packetsLost: 0,
+            roundTripTime: 0,
+          },
+        });
+      }
+      return;
+    }
+
+    peer.isReconnecting = true;
+    peer.reconnectAttempts++;
+
+    try {
+      // Create a new offer
+      const offer = await peer.connection.createOffer({
+        iceRestart: true,
+        offerToReceiveAudio: true,
+        offerToReceiveVideo: true,
+      });
+
+      await peer.connection.setLocalDescription(offer);
+      await this.sendSignalingMessage({
+        type: "OFFER",
+        offer,
+        toId: peerId,
+      });
+    } catch (error) {
+      console.error("Error reconnecting peer:", error);
+      peer.isReconnecting = false;
+    }
+  }
+
+  private async handleOffer(
+    offer: RTCSessionDescriptionInit,
+    fromId: string,
+    displayName: string
+  ) {
+    console.log("Handling offer from:", fromId);
+    let peerConnection = this.peers.get(fromId)?.connection;
 
     if (!peerConnection) {
-      peerConnection = this.createPeerConnection(from);
-      this.peers.set(from, {
-        peerId: from,
+      peerConnection = this.createPeerConnection(fromId);
+      this.peers.set(fromId, {
+        peerId: fromId,
         connection: peerConnection,
         mediaStream: null,
         recorder: null,
         recordedChunks: [],
+        displayName,
+        lastActivity: Date.now(),
+        reconnectAttempts: 0,
+        isReconnecting: false,
       });
     }
 
@@ -115,36 +369,46 @@ export class ConnectionManager {
       const answer = await peerConnection.createAnswer();
       await peerConnection.setLocalDescription(answer);
 
-      this.sendSignalingMessage({
-        type: "answer",
-        from: this.roomId,
-        to: from,
+      await this.sendSignalingMessage({
+        type: "ANSWER",
         answer,
+        toId: fromId,
       });
     } catch (error) {
       console.error("Error handling offer:", error);
-      this.cleanupPeer(from);
+      this.cleanupPeer(fromId);
     }
   }
 
-  private async handleAnswer(answer: RTCSessionDescriptionInit, from: string) {
-    console.log("Handling answer from:", from);
-    const peerConnection = this.peers.get(from)?.connection;
+  private async handleAnswer(
+    answer: RTCSessionDescriptionInit,
+    fromId: string
+  ) {
+    console.log("Handling answer from:", fromId);
+    const peerConnection = this.peers.get(fromId)?.connection;
     if (peerConnection) {
       try {
         await peerConnection.setRemoteDescription(
           new RTCSessionDescription(answer)
         );
+        const peer = this.peers.get(fromId);
+        if (peer) {
+          peer.isReconnecting = false;
+          peer.reconnectAttempts = 0;
+        }
       } catch (error) {
         console.error("Error handling answer:", error);
-        this.cleanupPeer(from);
+        this.cleanupPeer(fromId);
       }
     }
   }
 
-  private async handleCandidate(candidate: RTCIceCandidateInit, from: string) {
-    console.log("Handling candidate from:", from);
-    const peerConnection = this.peers.get(from)?.connection;
+  private async handleCandidate(
+    candidate: RTCIceCandidateInit,
+    fromId: string
+  ) {
+    console.log("Handling candidate from:", fromId);
+    const peerConnection = this.peers.get(fromId)?.connection;
     if (peerConnection) {
       try {
         await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
@@ -154,7 +418,13 @@ export class ConnectionManager {
     }
   }
 
-  private async sendSignalingMessage(message: any) {
+  private async sendSignalingMessage(message: {
+    type: "OFFER" | "ANSWER" | "ICE_CANDIDATE" | "JOIN" | "LEAVE" | "ERROR";
+    offer?: RTCSessionDescriptionInit;
+    answer?: RTCSessionDescriptionInit;
+    candidate?: RTCIceCandidateInit;
+    toId?: string;
+  }) {
     try {
       const response = await fetch("/api/webrtc/signal", {
         method: "POST",
@@ -168,34 +438,101 @@ export class ConnectionManager {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to send signaling message");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to send signaling message");
       }
+
+      const data = await response.json();
+      console.log("Signaling message response:", data);
+
+      return data;
     } catch (error) {
       console.error("Error sending signaling message:", error);
+      throw error;
     }
   }
 
   private async fetchSignalingMessages() {
+    if (!this.participantId) {
+      console.log("No participant ID yet, skipping message fetch");
+      return;
+    }
+
     try {
       const response = await fetch(`/api/webrtc/signal?roomId=${this.roomId}`);
       if (!response.ok) {
-        throw new Error("Failed to fetch signaling messages");
+        const errorData = await response.json();
+        if (errorData.error === "Participant not found") {
+          console.log("Participant not found, retrying JOIN message");
+          await this.sendSignalingMessage({ type: "JOIN" });
+          return;
+        }
+        throw new Error(
+          errorData.error || "Failed to fetch signaling messages"
+        );
       }
 
-      const messages = await response.json();
+      const messages: SignalingMessage[] = await response.json();
       console.log("Received signaling messages:", messages);
 
+      if (!Array.isArray(messages)) {
+        console.error("Invalid messages format:", messages);
+        return;
+      }
+
       for (const message of messages) {
+        // Skip our own messages
+        if (message.fromId === this.participantId) {
+          console.log("Skipping own message:", message);
+          continue;
+        }
+
+        console.log("Processing message:", message);
+
         switch (message.type) {
-          case "offer":
-            await this.handleOffer(message.offer, message.from);
+          case "OFFER":
+            if (!message.data.offer) {
+              console.error("Missing offer data in message:", message);
+              continue;
+            }
+            await this.handleOffer(
+              message.data.offer,
+              message.fromId,
+              message.from.user.name || "Unknown"
+            );
             break;
-          case "answer":
-            await this.handleAnswer(message.answer, message.from);
+          case "ANSWER":
+            if (!message.data.answer) {
+              console.error("Missing answer data in message:", message);
+              continue;
+            }
+            await this.handleAnswer(message.data.answer, message.fromId);
             break;
-          case "candidate":
-            await this.handleCandidate(message.candidate, message.from);
+          case "ICE_CANDIDATE":
+            if (!message.data.candidate) {
+              console.error("Missing candidate data in message:", message);
+              continue;
+            }
+            await this.handleCandidate(message.data.candidate, message.fromId);
             break;
+          case "ERROR":
+            console.error("Received error message:", message.data.error);
+            if (this.onConnectionStateChange) {
+              this.onConnectionStateChange(message.fromId, {
+                isConnected: false,
+                isReconnecting: false,
+                error: message.data.error || "Unknown error",
+                stats: {
+                  bytesReceived: 0,
+                  bytesSent: 0,
+                  packetsLost: 0,
+                  roundTripTime: 0,
+                },
+              });
+            }
+            break;
+          default:
+            console.warn("Unknown message type:", message.type);
         }
       }
     } catch (error) {
@@ -203,36 +540,90 @@ export class ConnectionManager {
     }
   }
 
+  private async updateConnectionStats() {
+    for (const [peerId, peer] of this.peers.entries()) {
+      try {
+        const stats = await peer.connection.getStats();
+        let bytesReceived = 0;
+        let bytesSent = 0;
+        let packetsLost = 0;
+        let roundTripTime = 0;
+
+        stats.forEach((report) => {
+          if (report.type === "inbound-rtp" && report.kind === "video") {
+            bytesReceived += report.bytesReceived || 0;
+            packetsLost += report.packetsLost || 0;
+          }
+          if (report.type === "outbound-rtp" && report.kind === "video") {
+            bytesSent += report.bytesSent || 0;
+          }
+          if (report.type === "candidate-pair" && report.selected) {
+            roundTripTime = report.currentRoundTripTime || 0;
+          }
+        });
+
+        if (this.onConnectionStateChange) {
+          this.onConnectionStateChange(peerId, {
+            isConnected: peer.connection.connectionState === "connected",
+            isReconnecting: peer.isReconnecting,
+            error: null,
+            stats: {
+              bytesReceived,
+              bytesSent,
+              packetsLost,
+              roundTripTime,
+            },
+          });
+        }
+      } catch (error) {
+        console.error("Error getting connection stats:", error);
+      }
+    }
+  }
+
   async startSignaling() {
     console.log("Starting signaling for room:", this.roomId);
 
-    // Start polling for signaling messages
-    this.signalingInterval = setInterval(
-      () => this.fetchSignalingMessages(),
-      1000
-    );
-
-    // Create and send initial offer
     try {
-      const peerConnection = this.createPeerConnection(this.roomId);
-      this.peers.set(this.roomId, {
-        peerId: this.roomId,
-        connection: peerConnection,
-        mediaStream: null,
-        recorder: null,
-        recordedChunks: [],
+      // First, ensure we have a participant ID by sending a JOIN message
+      const joinResponse = await this.sendSignalingMessage({
+        type: "JOIN",
       });
 
-      const offer = await peerConnection.createOffer();
-      await peerConnection.setLocalDescription(offer);
+      if (!joinResponse.success || !joinResponse.message?.fromId) {
+        throw new Error("Failed to get participant ID");
+      }
 
-      await this.sendSignalingMessage({
-        type: "offer",
-        from: this.roomId,
-        offer,
-      });
+      this.participantId = joinResponse.message.fromId;
+      console.log("Got participant ID:", this.participantId);
+
+      // Start polling for signaling messages
+      this.signalingInterval = setInterval(
+        () => this.fetchSignalingMessages(),
+        1000
+      );
+
+      // Start collecting connection stats
+      this.statsInterval = setInterval(
+        () => this.updateConnectionStats(),
+        2000
+      );
+
+      // Only create and send initial offer if we're the host
+      if (joinResponse.message.role === "HOST") {
+        console.log("Creating initial offer as host");
+        const peerConnection = this.createPeerConnection(this.roomId);
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+
+        await this.sendSignalingMessage({
+          type: "OFFER",
+          offer,
+        });
+      }
     } catch (error) {
-      console.error("Error creating initial offer:", error);
+      console.error("Error in startSignaling:", error);
+      throw error;
     }
   }
 
@@ -253,6 +644,9 @@ export class ConnectionManager {
     if (this.signalingInterval) {
       clearInterval(this.signalingInterval);
     }
+    if (this.statsInterval) {
+      clearInterval(this.statsInterval);
+    }
     if (this.localStream) {
       this.localStream.getTracks().forEach((track) => track.stop());
     }
@@ -264,7 +658,9 @@ export class ConnectionManager {
   startRecording(peerId: string) {
     const peer = this.peers.get(peerId);
     if (peer && peer.mediaStream) {
-      const recorder = new MediaRecorder(peer.mediaStream);
+      const recorder = new MediaRecorder(peer.mediaStream, {
+        mimeType: "video/webm;codecs=vp9,opus",
+      });
       peer.recorder = recorder;
       peer.recordedChunks = [];
 
@@ -284,7 +680,7 @@ export class ConnectionManager {
         URL.revokeObjectURL(url);
       };
 
-      recorder.start();
+      recorder.start(1000); // Collect data every second
     }
   }
 

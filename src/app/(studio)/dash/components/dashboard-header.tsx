@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { FiPlus, FiBell, FiSearch } from "react-icons/fi";
 
@@ -54,6 +54,13 @@ export function DashboardHeader() {
                 />
               </div>
             )}
+
+            <button
+              className="bg-zinc-100 text-zinc-600 ring ring-2 px-4 py-2 rounded-xl"
+              onClick={() => signOut()}
+            >
+              Sign Out
+            </button>
           </div>
         </div>
       </div>

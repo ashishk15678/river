@@ -2,7 +2,7 @@ import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -17,34 +17,55 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user }) {
+    async signIn({ user, account, profile }) {
       if (user) {
-        const dbUser = await prisma.user.findUnique({
-          where: { id: user.id },
-          select: { username: true, hasSetUsername: true },
+        // Ensure user exists in database
+        const dbUser = await prisma.user.upsert({
+          where: { email: user.email! },
+          update: {
+            name: user.name,
+            image: user.image,
+          },
+          create: {
+            email: user.email!,
+            name: user.name,
+            image: user.image,
+          },
         });
-        // @ts-ignore - we know these fields exist from our type definitions
-        user.username = dbUser?.username ?? null;
-        // @ts-ignore - we know these fields exist from our type definitions
-        user.hasSetUsername = dbUser?.hasSetUsername ?? false;
+
+        // Update user object with database ID
+        user.id = dbUser.id;
+        user.username = dbUser.username;
+        user.hasSetUsername = dbUser.hasSetUsername;
       }
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account, profile, trigger, session }) {
       if (user) {
         token.id = user.id;
-        // @ts-ignore - we know these fields exist from our type definitions
+        token.email = user.email;
+        token.name = user.name;
+        token.picture = user.image;
         token.username = user.username;
-        // @ts-ignore - we know these fields exist from our type definitions
         token.hasSetUsername = user.hasSetUsername;
       }
+
+      // Handle session updates
+      if (trigger === "update" && session) {
+        token.username = session.user.username;
+        token.hasSetUsername = session.user.hasSetUsername;
+      }
+
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id;
-        session.user.username = token.username;
-        session.user.hasSetUsername = token.hasSetUsername;
+        session.user.id = token.id as string;
+        session.user.email = token.email as string;
+        session.user.name = token.name as string;
+        session.user.image = token.picture as string;
+        session.user.username = token.username as string;
+        session.user.hasSetUsername = token.hasSetUsername as boolean;
       }
       return session;
     },
@@ -56,4 +77,5 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
+  debug: process.env.NODE_ENV === "development",
 };
