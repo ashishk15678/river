@@ -3847,6 +3847,13 @@ export namespace Prisma {
     image: string | null
     username: string | null
     hasSetUsername: boolean | null
+    bio: string | null
+    company: string | null
+    location: string | null
+    website: string | null
+    twitter: string | null
+    github: string | null
+    linkedin: string | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -3857,6 +3864,13 @@ export namespace Prisma {
     image: string | null
     username: string | null
     hasSetUsername: boolean | null
+    bio: string | null
+    company: string | null
+    location: string | null
+    website: string | null
+    twitter: string | null
+    github: string | null
+    linkedin: string | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -3867,6 +3881,13 @@ export namespace Prisma {
     image: number
     username: number
     hasSetUsername: number
+    bio: number
+    company: number
+    location: number
+    website: number
+    twitter: number
+    github: number
+    linkedin: number
     _all: number
   }
 
@@ -3879,6 +3900,13 @@ export namespace Prisma {
     image?: true
     username?: true
     hasSetUsername?: true
+    bio?: true
+    company?: true
+    location?: true
+    website?: true
+    twitter?: true
+    github?: true
+    linkedin?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -3889,6 +3917,13 @@ export namespace Prisma {
     image?: true
     username?: true
     hasSetUsername?: true
+    bio?: true
+    company?: true
+    location?: true
+    website?: true
+    twitter?: true
+    github?: true
+    linkedin?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -3899,6 +3934,13 @@ export namespace Prisma {
     image?: true
     username?: true
     hasSetUsername?: true
+    bio?: true
+    company?: true
+    location?: true
+    website?: true
+    twitter?: true
+    github?: true
+    linkedin?: true
     _all?: true
   }
 
@@ -3982,6 +4024,13 @@ export namespace Prisma {
     image: string | null
     username: string | null
     hasSetUsername: boolean
+    bio: string | null
+    company: string | null
+    location: string | null
+    website: string | null
+    twitter: string | null
+    github: string | null
+    linkedin: string | null
     _count: UserCountAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
@@ -4009,6 +4058,13 @@ export namespace Prisma {
     image?: boolean
     username?: boolean
     hasSetUsername?: boolean
+    bio?: boolean
+    company?: boolean
+    location?: boolean
+    website?: boolean
+    twitter?: boolean
+    github?: boolean
+    linkedin?: boolean
     accounts?: boolean | User$accountsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     rooms?: boolean | User$roomsArgs<ExtArgs>
@@ -4024,6 +4080,13 @@ export namespace Prisma {
     image?: boolean
     username?: boolean
     hasSetUsername?: boolean
+    bio?: boolean
+    company?: boolean
+    location?: boolean
+    website?: boolean
+    twitter?: boolean
+    github?: boolean
+    linkedin?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -4034,6 +4097,13 @@ export namespace Prisma {
     image?: boolean
     username?: boolean
     hasSetUsername?: boolean
+    bio?: boolean
+    company?: boolean
+    location?: boolean
+    website?: boolean
+    twitter?: boolean
+    github?: boolean
+    linkedin?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -4044,9 +4114,16 @@ export namespace Prisma {
     image?: boolean
     username?: boolean
     hasSetUsername?: boolean
+    bio?: boolean
+    company?: boolean
+    location?: boolean
+    website?: boolean
+    twitter?: boolean
+    github?: boolean
+    linkedin?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "username" | "hasSetUsername", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "username" | "hasSetUsername" | "bio" | "company" | "location" | "website" | "twitter" | "github" | "linkedin", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     accounts?: boolean | User$accountsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
@@ -4073,6 +4150,13 @@ export namespace Prisma {
       image: string | null
       username: string | null
       hasSetUsername: boolean
+      bio: string | null
+      company: string | null
+      location: string | null
+      website: string | null
+      twitter: string | null
+      github: string | null
+      linkedin: string | null
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -4507,6 +4591,13 @@ export namespace Prisma {
     readonly image: FieldRef<"User", 'String'>
     readonly username: FieldRef<"User", 'String'>
     readonly hasSetUsername: FieldRef<"User", 'Boolean'>
+    readonly bio: FieldRef<"User", 'String'>
+    readonly company: FieldRef<"User", 'String'>
+    readonly location: FieldRef<"User", 'String'>
+    readonly website: FieldRef<"User", 'String'>
+    readonly twitter: FieldRef<"User", 'String'>
+    readonly github: FieldRef<"User", 'String'>
+    readonly linkedin: FieldRef<"User", 'String'>
   }
     
 
@@ -9421,7 +9512,14 @@ export namespace Prisma {
     emailVerified: 'emailVerified',
     image: 'image',
     username: 'username',
-    hasSetUsername: 'hasSetUsername'
+    hasSetUsername: 'hasSetUsername',
+    bio: 'bio',
+    company: 'company',
+    location: 'location',
+    website: 'website',
+    twitter: 'twitter',
+    github: 'github',
+    linkedin: 'linkedin'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -9795,6 +9893,13 @@ export namespace Prisma {
     image?: StringNullableFilter<"User"> | string | null
     username?: StringNullableFilter<"User"> | string | null
     hasSetUsername?: BoolFilter<"User"> | boolean
+    bio?: StringNullableFilter<"User"> | string | null
+    company?: StringNullableFilter<"User"> | string | null
+    location?: StringNullableFilter<"User"> | string | null
+    website?: StringNullableFilter<"User"> | string | null
+    twitter?: StringNullableFilter<"User"> | string | null
+    github?: StringNullableFilter<"User"> | string | null
+    linkedin?: StringNullableFilter<"User"> | string | null
     accounts?: AccountListRelationFilter
     sessions?: SessionListRelationFilter
     rooms?: RoomListRelationFilter
@@ -9809,6 +9914,13 @@ export namespace Prisma {
     image?: SortOrderInput | SortOrder
     username?: SortOrderInput | SortOrder
     hasSetUsername?: SortOrder
+    bio?: SortOrderInput | SortOrder
+    company?: SortOrderInput | SortOrder
+    location?: SortOrderInput | SortOrder
+    website?: SortOrderInput | SortOrder
+    twitter?: SortOrderInput | SortOrder
+    github?: SortOrderInput | SortOrder
+    linkedin?: SortOrderInput | SortOrder
     accounts?: AccountOrderByRelationAggregateInput
     sessions?: SessionOrderByRelationAggregateInput
     rooms?: RoomOrderByRelationAggregateInput
@@ -9826,6 +9938,13 @@ export namespace Prisma {
     emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
     image?: StringNullableFilter<"User"> | string | null
     hasSetUsername?: BoolFilter<"User"> | boolean
+    bio?: StringNullableFilter<"User"> | string | null
+    company?: StringNullableFilter<"User"> | string | null
+    location?: StringNullableFilter<"User"> | string | null
+    website?: StringNullableFilter<"User"> | string | null
+    twitter?: StringNullableFilter<"User"> | string | null
+    github?: StringNullableFilter<"User"> | string | null
+    linkedin?: StringNullableFilter<"User"> | string | null
     accounts?: AccountListRelationFilter
     sessions?: SessionListRelationFilter
     rooms?: RoomListRelationFilter
@@ -9840,6 +9959,13 @@ export namespace Prisma {
     image?: SortOrderInput | SortOrder
     username?: SortOrderInput | SortOrder
     hasSetUsername?: SortOrder
+    bio?: SortOrderInput | SortOrder
+    company?: SortOrderInput | SortOrder
+    location?: SortOrderInput | SortOrder
+    website?: SortOrderInput | SortOrder
+    twitter?: SortOrderInput | SortOrder
+    github?: SortOrderInput | SortOrder
+    linkedin?: SortOrderInput | SortOrder
     _count?: UserCountOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
@@ -9856,6 +9982,13 @@ export namespace Prisma {
     image?: StringNullableWithAggregatesFilter<"User"> | string | null
     username?: StringNullableWithAggregatesFilter<"User"> | string | null
     hasSetUsername?: BoolWithAggregatesFilter<"User"> | boolean
+    bio?: StringNullableWithAggregatesFilter<"User"> | string | null
+    company?: StringNullableWithAggregatesFilter<"User"> | string | null
+    location?: StringNullableWithAggregatesFilter<"User"> | string | null
+    website?: StringNullableWithAggregatesFilter<"User"> | string | null
+    twitter?: StringNullableWithAggregatesFilter<"User"> | string | null
+    github?: StringNullableWithAggregatesFilter<"User"> | string | null
+    linkedin?: StringNullableWithAggregatesFilter<"User"> | string | null
   }
 
   export type VerificationTokenWhereInput = {
@@ -10273,6 +10406,13 @@ export namespace Prisma {
     image?: string | null
     username?: string | null
     hasSetUsername?: boolean
+    bio?: string | null
+    company?: string | null
+    location?: string | null
+    website?: string | null
+    twitter?: string | null
+    github?: string | null
+    linkedin?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     rooms?: RoomCreateNestedManyWithoutUserInput
@@ -10287,6 +10427,13 @@ export namespace Prisma {
     image?: string | null
     username?: string | null
     hasSetUsername?: boolean
+    bio?: string | null
+    company?: string | null
+    location?: string | null
+    website?: string | null
+    twitter?: string | null
+    github?: string | null
+    linkedin?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     rooms?: RoomUncheckedCreateNestedManyWithoutUserInput
@@ -10301,6 +10448,13 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
     hasSetUsername?: BoolFieldUpdateOperationsInput | boolean
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    github?: NullableStringFieldUpdateOperationsInput | string | null
+    linkedin?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     rooms?: RoomUpdateManyWithoutUserNestedInput
@@ -10315,6 +10469,13 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
     hasSetUsername?: BoolFieldUpdateOperationsInput | boolean
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    github?: NullableStringFieldUpdateOperationsInput | string | null
+    linkedin?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     rooms?: RoomUncheckedUpdateManyWithoutUserNestedInput
@@ -10329,6 +10490,13 @@ export namespace Prisma {
     image?: string | null
     username?: string | null
     hasSetUsername?: boolean
+    bio?: string | null
+    company?: string | null
+    location?: string | null
+    website?: string | null
+    twitter?: string | null
+    github?: string | null
+    linkedin?: string | null
   }
 
   export type UserUpdateManyMutationInput = {
@@ -10339,6 +10507,13 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
     hasSetUsername?: BoolFieldUpdateOperationsInput | boolean
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    github?: NullableStringFieldUpdateOperationsInput | string | null
+    linkedin?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -10349,6 +10524,13 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
     hasSetUsername?: BoolFieldUpdateOperationsInput | boolean
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    github?: NullableStringFieldUpdateOperationsInput | string | null
+    linkedin?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type VerificationTokenCreateInput = {
@@ -10877,6 +11059,13 @@ export namespace Prisma {
     image?: SortOrder
     username?: SortOrder
     hasSetUsername?: SortOrder
+    bio?: SortOrder
+    company?: SortOrder
+    location?: SortOrder
+    website?: SortOrder
+    twitter?: SortOrder
+    github?: SortOrder
+    linkedin?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -10887,6 +11076,13 @@ export namespace Prisma {
     image?: SortOrder
     username?: SortOrder
     hasSetUsername?: SortOrder
+    bio?: SortOrder
+    company?: SortOrder
+    location?: SortOrder
+    website?: SortOrder
+    twitter?: SortOrder
+    github?: SortOrder
+    linkedin?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -10897,6 +11093,13 @@ export namespace Prisma {
     image?: SortOrder
     username?: SortOrder
     hasSetUsername?: SortOrder
+    bio?: SortOrder
+    company?: SortOrder
+    location?: SortOrder
+    website?: SortOrder
+    twitter?: SortOrder
+    github?: SortOrder
+    linkedin?: SortOrder
   }
 
   export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -11905,6 +12108,13 @@ export namespace Prisma {
     image?: string | null
     username?: string | null
     hasSetUsername?: boolean
+    bio?: string | null
+    company?: string | null
+    location?: string | null
+    website?: string | null
+    twitter?: string | null
+    github?: string | null
+    linkedin?: string | null
     sessions?: SessionCreateNestedManyWithoutUserInput
     rooms?: RoomCreateNestedManyWithoutUserInput
     participants?: ParticipantCreateNestedManyWithoutUserInput
@@ -11918,6 +12128,13 @@ export namespace Prisma {
     image?: string | null
     username?: string | null
     hasSetUsername?: boolean
+    bio?: string | null
+    company?: string | null
+    location?: string | null
+    website?: string | null
+    twitter?: string | null
+    github?: string | null
+    linkedin?: string | null
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     rooms?: RoomUncheckedCreateNestedManyWithoutUserInput
     participants?: ParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -11947,6 +12164,13 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
     hasSetUsername?: BoolFieldUpdateOperationsInput | boolean
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    github?: NullableStringFieldUpdateOperationsInput | string | null
+    linkedin?: NullableStringFieldUpdateOperationsInput | string | null
     sessions?: SessionUpdateManyWithoutUserNestedInput
     rooms?: RoomUpdateManyWithoutUserNestedInput
     participants?: ParticipantUpdateManyWithoutUserNestedInput
@@ -11960,6 +12184,13 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
     hasSetUsername?: BoolFieldUpdateOperationsInput | boolean
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    github?: NullableStringFieldUpdateOperationsInput | string | null
+    linkedin?: NullableStringFieldUpdateOperationsInput | string | null
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     rooms?: RoomUncheckedUpdateManyWithoutUserNestedInput
     participants?: ParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -11973,6 +12204,13 @@ export namespace Prisma {
     image?: string | null
     username?: string | null
     hasSetUsername?: boolean
+    bio?: string | null
+    company?: string | null
+    location?: string | null
+    website?: string | null
+    twitter?: string | null
+    github?: string | null
+    linkedin?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     rooms?: RoomCreateNestedManyWithoutUserInput
     participants?: ParticipantCreateNestedManyWithoutUserInput
@@ -11986,6 +12224,13 @@ export namespace Prisma {
     image?: string | null
     username?: string | null
     hasSetUsername?: boolean
+    bio?: string | null
+    company?: string | null
+    location?: string | null
+    website?: string | null
+    twitter?: string | null
+    github?: string | null
+    linkedin?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     rooms?: RoomUncheckedCreateNestedManyWithoutUserInput
     participants?: ParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -12015,6 +12260,13 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
     hasSetUsername?: BoolFieldUpdateOperationsInput | boolean
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    github?: NullableStringFieldUpdateOperationsInput | string | null
+    linkedin?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     rooms?: RoomUpdateManyWithoutUserNestedInput
     participants?: ParticipantUpdateManyWithoutUserNestedInput
@@ -12028,6 +12280,13 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
     hasSetUsername?: BoolFieldUpdateOperationsInput | boolean
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    github?: NullableStringFieldUpdateOperationsInput | string | null
+    linkedin?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     rooms?: RoomUncheckedUpdateManyWithoutUserNestedInput
     participants?: ParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -12277,6 +12536,13 @@ export namespace Prisma {
     image?: string | null
     username?: string | null
     hasSetUsername?: boolean
+    bio?: string | null
+    company?: string | null
+    location?: string | null
+    website?: string | null
+    twitter?: string | null
+    github?: string | null
+    linkedin?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     participants?: ParticipantCreateNestedManyWithoutUserInput
@@ -12290,6 +12556,13 @@ export namespace Prisma {
     image?: string | null
     username?: string | null
     hasSetUsername?: boolean
+    bio?: string | null
+    company?: string | null
+    location?: string | null
+    website?: string | null
+    twitter?: string | null
+    github?: string | null
+    linkedin?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     participants?: ParticipantUncheckedCreateNestedManyWithoutUserInput
@@ -12379,6 +12652,13 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
     hasSetUsername?: BoolFieldUpdateOperationsInput | boolean
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    github?: NullableStringFieldUpdateOperationsInput | string | null
+    linkedin?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     participants?: ParticipantUpdateManyWithoutUserNestedInput
@@ -12392,6 +12672,13 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
     hasSetUsername?: BoolFieldUpdateOperationsInput | boolean
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    github?: NullableStringFieldUpdateOperationsInput | string | null
+    linkedin?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     participants?: ParticipantUncheckedUpdateManyWithoutUserNestedInput
@@ -12476,6 +12763,13 @@ export namespace Prisma {
     image?: string | null
     username?: string | null
     hasSetUsername?: boolean
+    bio?: string | null
+    company?: string | null
+    location?: string | null
+    website?: string | null
+    twitter?: string | null
+    github?: string | null
+    linkedin?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     rooms?: RoomCreateNestedManyWithoutUserInput
@@ -12489,6 +12783,13 @@ export namespace Prisma {
     image?: string | null
     username?: string | null
     hasSetUsername?: boolean
+    bio?: string | null
+    company?: string | null
+    location?: string | null
+    website?: string | null
+    twitter?: string | null
+    github?: string | null
+    linkedin?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     rooms?: RoomUncheckedCreateNestedManyWithoutUserInput
@@ -12609,6 +12910,13 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
     hasSetUsername?: BoolFieldUpdateOperationsInput | boolean
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    github?: NullableStringFieldUpdateOperationsInput | string | null
+    linkedin?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     rooms?: RoomUpdateManyWithoutUserNestedInput
@@ -12622,6 +12930,13 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     username?: NullableStringFieldUpdateOperationsInput | string | null
     hasSetUsername?: BoolFieldUpdateOperationsInput | boolean
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    github?: NullableStringFieldUpdateOperationsInput | string | null
+    linkedin?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     rooms?: RoomUncheckedUpdateManyWithoutUserNestedInput

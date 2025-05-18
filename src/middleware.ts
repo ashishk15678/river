@@ -14,7 +14,7 @@ export default async function middleware(req: NextRequestWithAuth) {
   // Redirect authenticated users away from auth pages
   if (isAuthPage) {
     if (isAuth) {
-      // If user hasn't set username, redirect to setup
+      // If user hasn't set username, redirect to sthe landing page sucks , make it like dasboardetup
       if (!token.hasSetUsername) {
         return NextResponse.redirect(new URL("/setup-username", req.url));
       }

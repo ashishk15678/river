@@ -28,6 +28,7 @@ import {
   LogOut,
   Folder,
   Calendar,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,22 +36,16 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Slider } from "@/components/ui/slider";
+import { useRouter } from "next/navigation";
+import HostComponent from "@/components/peerjs/HostComponent";
 
-export default function Dashboard({
-  isLoaded,
-  setIsLoaded,
-  isRecording,
-  setIsRecording,
-  sidebarCollapsed,
-  setSidebarCollapsed,
-}: {
-  isLoaded: boolean;
-  setIsLoaded: (isLoaded: boolean) => void;
-  isRecording: boolean;
-  setIsRecording: (isRecording: boolean) => void;
-  sidebarCollapsed: boolean;
-  setSidebarCollapsed: (sidebarCollapsed: boolean) => void;
-}) {
+export default function Dashboard() {
+  const router = useRouter();
+
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     setIsLoaded(true);
   }, []);
@@ -63,8 +58,163 @@ export default function Dashboard({
     setSidebarCollapsed(!sidebarCollapsed);
   };
 
+  const [volumeLevel, setVolumeLevel] = useState(0);
+
+  useEffect(() => {
+    if (window.navigator.mediaDevices) {
+      window.navigator.mediaDevices
+        .getUserMedia({
+          audio: true,
+        })
+        .then((stream) => {
+          const mediaRecorder = new MediaRecorder(stream);
+          mediaRecorder.addEventListener("dataavailable", (event) => {
+            if (event.data.size > 0) {
+              const audioBlob = event.data;
+              setVolumeLevel(audioBlob.size);
+              console.log({ size: audioBlob.size });
+            }
+          });
+        });
+    }
+  }, []);
+
   return (
     <div className="dashboard-bg min-h-screen">
+      {/* Sidebar */}
+      <div
+        className={`dashboard-sidebar ${sidebarCollapsed ? "collapsed" : ""}`}
+      >
+        <div className="p-4 flex items-center justify-between border-b border-gray-200">
+          <div className="flex items-center">
+            {!sidebarCollapsed && (
+              <h1 className="text-xl font-bold text-gray-900">MusicWave</h1>
+            )}
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleSidebar}
+            className="comic-button bg-white p-1"
+          >
+            {sidebarCollapsed ? <Menu size={28} /> : <ChevronLeft size={18} />}
+          </Button>
+        </div>
+
+        <div className="py-4">
+          <div className="mb-6">
+            <p
+              className={`px-4 text-xs font-semibold text-gray-500 mb-2 ${
+                sidebarCollapsed ? "hidden" : ""
+              }`}
+            >
+              MAIN
+            </p>
+            <nav>
+              <a href="#" className="sidebar-link active">
+                <Home size={20} className="icon" />
+                <span className="text">Dashboard</span>
+              </a>
+              <a href="#" className="sidebar-link">
+                <Mic size={20} className="icon" />
+                <span className="text">Studio</span>
+              </a>
+              <a href="#" className="sidebar-link">
+                <Folder size={20} className="icon" />
+                <span className="text">Library</span>
+              </a>
+              <a href="#" className="sidebar-link">
+                <Calendar size={20} className="icon" />
+                <span className="text">Schedule</span>
+              </a>
+            </nav>
+          </div>
+
+          <div className="mb-6">
+            <p
+              className={`px-4 text-xs font-semibold text-gray-500 mb-2 ${
+                sidebarCollapsed ? "hidden" : ""
+              }`}
+            >
+              ANALYTICS
+            </p>
+            <nav>
+              <a href="#" className="sidebar-link">
+                <BarChart2 size={20} className="icon" />
+                <span className="text">Statistics</span>
+              </a>
+              <a href="#" className="sidebar-link">
+                <Users size={20} className="icon" />
+                <span className="text">Audience</span>
+              </a>
+              <a href="#" className="sidebar-link">
+                <MessageSquare size={20} className="icon" />
+                <span className="text">Feedback</span>
+              </a>
+            </nav>
+          </div>
+
+          <div>
+            <p
+              className={`px-4 text-xs font-semibold text-gray-500 mb-2 ${
+                sidebarCollapsed ? "hidden" : ""
+              }`}
+            >
+              SETTINGS
+            </p>
+            <nav>
+              <a href="#" className="sidebar-link">
+                <Settings size={20} className="icon" />
+                <span className="text">Settings</span>
+              </a>
+              <a href="#" className="sidebar-link">
+                <HelpCircle size={20} className="icon" />
+                <span className="text">Help</span>
+              </a>
+            </nav>
+          </div>
+        </div>
+
+        <div className={`sidebar-footer ${sidebarCollapsed ? "p-2" : ""}`}>
+          {!sidebarCollapsed && (
+            <div className="flex items-center mb-4">
+              <Avatar className="h-10 w-10 mr-3">
+                <AvatarImage
+                  src="/placeholder.svg?height=40&width=40"
+                  alt="User"
+                />
+                <AvatarFallback>U</AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="font-medium text-sm">Alex Johnson</p>
+                <p className="text-xs text-gray-500">alex@example.com</p>
+              </div>
+            </div>
+          )}
+
+          {sidebarCollapsed && (
+            <Avatar className="h-10 w-10 mx-auto mb-4">
+              <AvatarImage
+                src="/placeholder.svg?height=40&width=40"
+                alt="User"
+              />
+              <AvatarFallback>U</AvatarFallback>
+            </Avatar>
+          )}
+
+          <Button
+            variant="outline"
+            size="sm"
+            className={`comic-button bg-white ${
+              sidebarCollapsed ? "w-full justify-center" : "w-full"
+            }`}
+          >
+            <LogOut size={16} className={sidebarCollapsed ? "" : "mr-2"} />
+            {!sidebarCollapsed && <span>Sign Out</span>}
+          </Button>
+        </div>
+      </div>
+
       {/* Main Content */}
       <div
         className={`dashboard-content ${
@@ -105,10 +255,37 @@ export default function Dashboard({
               animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : -20 }}
               transition={{ duration: 0.5 }}
             >
-              <Button variant="outline" className="comic-button bg-white">
-                <Plus size={16} className="mr-2" /> New Project
+              <Button
+                variant="outline"
+                className="comic-button bg-white"
+                onClick={async () => {
+                  setLoading(true);
+                  try {
+                    const response = await fetch("/api/webrtc/room", {
+                      method: "POST",
+                      body: JSON.stringify({
+                        displayName: "Alex Johnson",
+                        role: "host",
+                      }),
+                    });
+                    const data = await response.json();
+                    router.push(`/room/${data.roomId}`);
+                  } catch (error) {
+                    console.error(error);
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+              >
+                {loading ? (
+                  <Loader2 size={16} className="mr-2" />
+                ) : (
+                  <Plus size={16} className="mr-2" />
+                )}
+                New Project
               </Button>
             </motion.div>
+            <HostComponent />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
@@ -283,13 +460,12 @@ export default function Dashboard({
                               <div className="flex items-center space-x-2">
                                 <span className="text-xs w-12">You</span>
                                 <div className="h-2 bg-gray-200 rounded-full flex-1">
-                                  <div className="h-2 bg-green-500 rounded-full w-3/4 animate-pulse"></div>
-                                </div>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <span className="text-xs w-12">Guest</span>
-                                <div className="h-2 bg-gray-200 rounded-full flex-1">
-                                  <div className="h-2 bg-green-500 rounded-full w-1/2 animate-pulse"></div>
+                                  <div
+                                    className="h-2 bg-green-500 rounded-full w-3/4 animate-pulse"
+                                    style={{
+                                      width: `${volumeLevel}%`,
+                                    }}
+                                  ></div>
                                 </div>
                               </div>
                             </div>

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import type { Participant, User } from "@/generated/prisma";
+import { HostWebSocketServer } from "@/lib/webrtc/connection-manager";
 
 export async function POST(request: NextRequest) {
   try {
@@ -51,6 +52,15 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    try {
+      const ws = new HostWebSocketServer(3000);
+    } catch (error) {
+      console.error("Error in room API:", error);
+      return NextResponse.json(
+        { error: "Internal server error" },
+        { status: 500 }
+      );
+    }
     return NextResponse.json({
       roomId: room.id,
       participantId: room.participants[0].id,

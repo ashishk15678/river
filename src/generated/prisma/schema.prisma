@@ -49,6 +49,13 @@ model User {
   image          String?
   username       String?       @unique
   hasSetUsername Boolean       @default(false)
+  bio            String?       @db.Text
+  company        String?
+  location       String?
+  website        String?
+  twitter        String?
+  github         String?
+  linkedin       String?
   accounts       Account[]
   sessions       Session[]
   rooms          Room[]
