@@ -4,7 +4,6 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import type { Participant, User } from "@/generated/prisma";
-import { HostWebSocketServer } from "@/lib/webrtc/connection-manager";
 
 export async function POST(request: NextRequest) {
   try {

@@ -71,15 +71,19 @@ model VerificationToken {
 }
 
 model Room {
-  id           String             @id @default(cuid())
-  title        String
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
-  status       RoomStatus         @default(ACTIVE)
-  userId       String
-  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  participants Participant[]
-  messages     SignalingMessage[]
+  id            String             @id @default(cuid())
+  title         String
+  status        RoomStatus         @default(ACTIVE)
+  userId        String
+  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  participants  Participant[]
+  messages      SignalingMessage[]
+  offers        Offer[]            @relation("RoomOffers")
+  iceCandidates IceCandidate[]     @relation("RoomIceCandidates")
+
+  // Time related
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Participant {
@@ -93,8 +97,27 @@ model Participant {
   user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   sentMessages     SignalingMessage[] @relation("SentMessages")
   receivedMessages SignalingMessage[] @relation("ReceivedMessages")
+  iceCandidates    IceCandidate[]
 
   @@unique([userId, roomId])
+}
+
+model Offer {
+  id        String   @id @default(cuid())
+  roomId    String
+  sdp       String
+  createdAt DateTime @default(now())
+  room      Room     @relation("RoomOffers", fields: [roomId], references: [id], onDelete: Cascade)
+}
+
+model IceCandidate {
+  id          String       @id @default(cuid())
+  roomId      String
+  candidate   String
+  clientId    String
+  createdAt   DateTime     @default(now())
+  room        Room         @relation("RoomIceCandidates", fields: [roomId], references: [id], onDelete: Cascade)
+  participant Participant? @relation(fields: [clientId], references: [id])
 }
 
 model SignalingMessage {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Mic,
@@ -37,17 +37,200 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Slider } from "@/components/ui/slider";
 import { useRouter } from "next/navigation";
-import HostComponent from "@/components/peerjs/HostComponent";
 
 export default function Dashboard() {
   const router = useRouter();
 
+  // initiatliasation
+  const peer = useRef<RTCPeerConnection>(null);
+  const dataChannels = useRef<Map<string, RTCDataChannel>>(new Map());
+  const participants = useRef<Map<string, { muted: boolean }>>(new Map());
+
+  useEffect(() => {
+    const initializeHost = async () => {
+      const peer = new RTCPeerConnection({
+        iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+      });
+
+      // Handle incoming connections
+      peer.onicecandidate = ({ candidate }) => {
+        if (candidate) {
+          // Store candidates to share with new participants
+        }
+      };
+
+      peer.ontrack = (event) => {
+        // Handle incoming media tracks
+        const video = document.createElement("video");
+        video.srcObject = event.streams[0];
+        document.body.appendChild(video);
+      };
+
+      // Create data channel for room control
+      const controlChannel = peer.createDataChannel("control");
+      controlChannel.onmessage = handleControlMessage;
+
+      // Register room with server
+      await fetch("/api/create-room", {
+        method: "POST",
+        body: JSON.stringify({ hostPeerId: peer.localDescription?.sdp }),
+      });
+
+      return () => peer.close();
+    };
+
+    initializeHost();
+  }, []);
+
+  const broadcastState = () => {
+    const state = Array.from(participants.current.entries()).map(
+      ([id, data]) => ({
+        userId: id,
+        muted: data.muted,
+      })
+    );
+
+    dataChannels.current.forEach((channel) => {
+      channel.send(JSON.stringify({ type: "stateUpdate", state }));
+    });
+  };
+
+  const handleControlMessage = useCallback((event: MessageEvent) => {
+    const { type, userId, data } = JSON.parse(event.data);
+
+    switch (type) {
+      case "mute":
+        participants.current.set(userId, {
+          ...participants.current.get(userId),
+          muted: true,
+        });
+        broadcastState();
+        break;
+
+      case "kick":
+        dataChannels.current.get(userId)?.close();
+        participants.current.delete(userId);
+        break;
+    }
+  }, []);
+
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [volumeLevel, setVolumeLevel] = useState(0);
+  const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
+  const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     setIsLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    let audioContext: AudioContext | null = null;
+    let animationFrameId: number;
+
+    const initializeMedia = async () => {
+      try {
+        console.log("Requesting user media...");
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          throw new Error("Your browser does not support media devices");
+        }
+
+        const stream = await navigator.mediaDevices
+          .getUserMedia({
+            audio: true,
+            video: true,
+          })
+          .catch((err) => {
+            if (err.name === "NotAllowedError") {
+              throw new Error(
+                "Camera and microphone access was denied. Please allow access to use this feature."
+              );
+            } else if (err.name === "NotFoundError") {
+              throw new Error(
+                "No camera or microphone found. Please connect a device and try again."
+              );
+            } else if (err.name === "NotReadableError") {
+              throw new Error(
+                "Your camera or microphone is already in use by another application."
+              );
+            } else {
+              throw new Error(`Failed to access media devices: ${err.message}`);
+            }
+          });
+
+        console.log("Got media stream:", stream);
+
+        if (!stream.getVideoTracks().length) {
+          throw new Error("No video track found in the stream");
+        }
+
+        setMediaStream(stream);
+        setError(null); // Clear any previous errors
+
+        if (videoRef.current) {
+          console.log("Setting video stream to element");
+          videoRef.current.srcObject = stream;
+          // Ensure video starts playing
+          videoRef.current.play().catch((err) => {
+            console.error("Error playing video:", err);
+            setError(
+              "Failed to start video playback. Please try refreshing the page."
+            );
+          });
+        } else {
+          throw new Error(
+            "Video element not found. Please try refreshing the page."
+          );
+        }
+
+        // Set up audio level monitoring
+        try {
+          audioContext = new AudioContext();
+          const source = audioContext.createMediaStreamSource(stream);
+          const analyzer = audioContext.createAnalyser();
+          analyzer.fftSize = 256;
+          source.connect(analyzer);
+
+          const dataArray = new Uint8Array(analyzer.frequencyBinCount);
+          const updateVolume = () => {
+            if (!audioContext) return;
+            analyzer.getByteFrequencyData(dataArray);
+            const average =
+              dataArray.reduce((a, b) => a + b) / dataArray.length;
+            setVolumeLevel(Math.min(100, (average / 128) * 100));
+            animationFrameId = requestAnimationFrame(updateVolume);
+          };
+          updateVolume();
+        } catch (err) {
+          console.error("Error setting up audio monitoring:", err);
+          setError(
+            "Failed to set up audio monitoring. Video should still work."
+          );
+        }
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "An unknown error occurred";
+        console.error("Error accessing media devices:", error);
+        setError(errorMessage);
+      }
+    };
+
+    initializeMedia();
+
+    return () => {
+      // Cleanup media stream and audio context
+      if (mediaStream) {
+        mediaStream.getTracks().forEach((track) => track.stop());
+      }
+      if (audioContext) {
+        audioContext.close();
+      }
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
   }, []);
 
   const toggleRecording = () => {
@@ -57,27 +240,6 @@ export default function Dashboard() {
   const toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed);
   };
-
-  const [volumeLevel, setVolumeLevel] = useState(0);
-
-  useEffect(() => {
-    if (window.navigator.mediaDevices) {
-      window.navigator.mediaDevices
-        .getUserMedia({
-          audio: true,
-        })
-        .then((stream) => {
-          const mediaRecorder = new MediaRecorder(stream);
-          mediaRecorder.addEventListener("dataavailable", (event) => {
-            if (event.data.size > 0) {
-              const audioBlob = event.data;
-              setVolumeLevel(audioBlob.size);
-              console.log({ size: audioBlob.size });
-            }
-          });
-        });
-    }
-  }, []);
 
   return (
     <div className="dashboard-bg min-h-screen">
@@ -285,8 +447,51 @@ export default function Dashboard() {
                 New Project
               </Button>
             </motion.div>
-            <HostComponent />
           </div>
+
+          {error && (
+            <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md">
+              <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-lg">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg
+                      className="h-5 w-5 text-red-500"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium">{error}</p>
+                  </div>
+                  <div className="ml-auto pl-3">
+                    <button
+                      onClick={() => setError(null)}
+                      className="inline-flex text-red-500 hover:text-red-700 focus:outline-none"
+                    >
+                      <span className="sr-only">Dismiss</span>
+                      <svg
+                        className="h-5 w-5"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             <div className="lg:col-span-2">
@@ -306,16 +511,14 @@ export default function Dashboard() {
                       <CardContent className="p-4">
                         <div className="aspect-video bg-gray-100 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
                           <div className="absolute inset-0 grid grid-cols-2 gap-2 p-4">
-                            <div className="bg-gray-200 rounded-lg flex items-center justify-center">
-                              <Avatar className="h-20 w-20">
-                                <AvatarImage
-                                  src="/placeholder.svg?height=80&width=80"
-                                  alt="Host"
-                                />
-                                <AvatarFallback className="text-2xl">
-                                  H
-                                </AvatarFallback>
-                              </Avatar>
+                            <div className="bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
+                              <video
+                                ref={videoRef}
+                                autoPlay
+                                playsInline
+                                muted
+                                className="w-full h-full object-cover"
+                              />
                             </div>
                             <div className="bg-gray-200 rounded-lg flex items-center justify-center">
                               <Avatar className="h-20 w-20">

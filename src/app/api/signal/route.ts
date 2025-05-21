@@ -1,112 +1,60 @@
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { MessageType } from "@/generated/prisma";
-export async function POST(req: Request) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const action = searchParams.get("action");
+import { checkActiveRoom } from "@/lib/utils";
+import { useSession } from "next-auth/react";
+import { NextResponse } from "next/server";
 
-    if (!action) {
-      return NextResponse.json(
-        { error: "Missing action parameter" },
-        { status: 400 }
-      );
-    }
+export default async function POST(req: Request) {
+  const { type, roomId, payload } = await req.json();
+  const { data } = await useSession();
 
-    const body = await req.json();
+  if (!data?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-    // Common validation
-    if (!body.roomId || !body.userId || !body.userType) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
-    }
+  if (type == "create") {
+    const room = await prisma.room.create({
+      data: {
+        id: roomId,
+        title: "",
+        userId: data.user.id,
+        participants: {
+          create: {
+            userId: data.user.id,
+            role: "HOST",
+          },
+        },
+      },
+    });
+    return NextResponse.json({ success: true, room });
+  }
 
-    const { roomId, userId, userType, targetId, message } = body;
-
+  if (type == "join") {
     const room = await prisma.room.findUnique({
       where: { id: roomId },
-      include: {
-        participants: true,
-        messages: true,
-      },
     });
 
     if (!room) {
-      return NextResponse.json({ error: "Room not found" }, { status: 404 });
+      return NextResponse.json({ success: false, msg: "No such room" });
     }
 
-    switch (action) {
-      case "join":
-        //transaction
-        await prisma.$transaction(async (tx) => {
-          // Add participant
-          await tx.participant.create({
-            data: {
-              roomId,
-              userId,
-              role: userType,
-            },
-          });
+    checkActiveRoom(room);
 
-          // Initialize messages queue
-          await tx.signalingMessage.create({
-            data: {
-              roomId,
-              fromId: userId,
-              toId: null,
-              data: message,
-              type: MessageType.JOIN,
-            },
-          });
-        });
-        return NextResponse.json({ success: true });
+    const updateRoom = await prisma.room.update({
+      where: { id: roomId },
 
-      case "signal":
-        // Validate target
-        if (!targetId || !message) {
-          return NextResponse.json(
-            { error: "Missing targetId or message" },
-            { status: 400 }
-          );
-        }
+      data: {
+        participants: {
+          create: {
+            userId: data.user.id,
+            role: "GUEST",
+          },
+        },
+      },
+    });
 
-        // Store message for target
-        if (room.messages.find((m) => m.toId === targetId)) {
-          room.messages.push({
-            id: userId,
-            createdAt: new Date(),
-            type: MessageType.ICE_CANDIDATE,
-            fromId: userId,
-            toId: targetId,
-            data: message,
-            processed: false,
-            roomId,
-          });
-        }
-        return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, room: updateRoom });
+  }
 
-      case "poll":
-        // Get messages for user
-        const messages = room.messages.get(userId) || [];
-        room.messages.set(userId, []); // Clear after polling
-        return NextResponse.json(messages);
-
-      case "list":
-        // Return participant list
-        return NextResponse.json({
-          participants: Array.from(room.participants.values()),
-        });
-
-      default:
-        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
-    }
-  } catch (error) {
-    console.error("API Error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+  if (type == "SIGNAL") {
   }
 }

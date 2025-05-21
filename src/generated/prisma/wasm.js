@@ -168,10 +168,10 @@ exports.Prisma.VerificationTokenScalarFieldEnum = {
 exports.Prisma.RoomScalarFieldEnum = {
   id: 'id',
   title: 'title',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
   status: 'status',
-  userId: 'userId'
+  userId: 'userId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.ParticipantScalarFieldEnum = {
@@ -181,6 +181,21 @@ exports.Prisma.ParticipantScalarFieldEnum = {
   role: 'role',
   joinedAt: 'joinedAt',
   leftAt: 'leftAt'
+};
+
+exports.Prisma.OfferScalarFieldEnum = {
+  id: 'id',
+  roomId: 'roomId',
+  sdp: 'sdp',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.IceCandidateScalarFieldEnum = {
+  id: 'id',
+  roomId: 'roomId',
+  candidate: 'candidate',
+  clientId: 'clientId',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.SignalingMessageScalarFieldEnum = {
@@ -248,6 +263,8 @@ exports.Prisma.ModelName = {
   VerificationToken: 'VerificationToken',
   Room: 'Room',
   Participant: 'Participant',
+  Offer: 'Offer',
+  IceCandidate: 'IceCandidate',
   SignalingMessage: 'SignalingMessage'
 };
 

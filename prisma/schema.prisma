@@ -73,7 +73,6 @@ model VerificationToken {
 model Room {
   id            String       @id @default(cuid())
   title         String
-  hostPeerId    String
   status        RoomStatus   @default(ACTIVE)
   userId        String
   user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
