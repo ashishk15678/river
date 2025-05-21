@@ -1,5 +1,15 @@
+"use client";
+import { useSession } from "next-auth/react";
 import { SignInForm } from "./signin-form";
+import { redirect } from "next/navigation";
 export default function SignInPage() {
+  const { data } = useSession();
+
+  if (data?.user) {
+    redirect("/dash");
+  }
+
+  console.log(data);
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-xl shadow-lg">

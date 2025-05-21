@@ -42,16 +42,24 @@ model Session {
 }
 
 model User {
-  id             String    @id @default(cuid())
+  id             String        @id @default(cuid())
   name           String?
-  email          String?   @unique
+  email          String?       @unique
   emailVerified  DateTime?
   image          String?
-  username       String?   @unique
-  hasSetUsername Boolean   @default(false)
+  username       String?       @unique
+  hasSetUsername Boolean       @default(false)
+  bio            String?       @db.Text
+  company        String?
+  location       String?
+  website        String?
+  twitter        String?
+  github         String?
+  linkedin       String?
   accounts       Account[]
   sessions       Session[]
-  podcasts       Podcast[]
+  rooms          Room[]
+  participants   Participant[]
 }
 
 model VerificationToken {
@@ -62,11 +70,89 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-model Podcast {
-  id        String   @id @default(cuid())
-  title     String
+model Room {
+  id            String             @id @default(cuid())
+  title         String
+  status        RoomStatus         @default(ACTIVE)
+  userId        String
+  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  participants  Participant[]
+  messages      SignalingMessage[]
+  offers        Offer[]            @relation("RoomOffers")
+  iceCandidates IceCandidate[]     @relation("RoomIceCandidates")
+
+  // Time related
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Participant {
+  id               String             @id @default(cuid())
+  userId           String
+  roomId           String
+  role             Role               @default(GUEST)
+  joinedAt         DateTime           @default(now())
+  leftAt           DateTime?
+  room             Room               @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sentMessages     SignalingMessage[] @relation("SentMessages")
+  receivedMessages SignalingMessage[] @relation("ReceivedMessages")
+  iceCandidates    IceCandidate[]
+
+  @@unique([userId, roomId])
+}
+
+model Offer {
+  id        String   @id @default(cuid())
+  roomId    String
+  sdp       String
+  createdAt DateTime @default(now())
+  room      Room     @relation("RoomOffers", fields: [roomId], references: [id], onDelete: Cascade)
+}
+
+model IceCandidate {
+  id          String       @id @default(cuid())
+  roomId      String
+  candidate   String
+  clientId    String
+  createdAt   DateTime     @default(now())
+  room        Room         @relation("RoomIceCandidates", fields: [roomId], references: [id], onDelete: Cascade)
+  participant Participant? @relation(fields: [clientId], references: [id])
+}
+
+model SignalingMessage {
+  id        String       @id @default(cuid())
+  type      MessageType
+  roomId    String
+  fromId    String
+  toId      String?
+  data      Json
+  createdAt DateTime     @default(now())
+  processed Boolean      @default(false)
+  room      Room         @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  from      Participant  @relation("SentMessages", fields: [fromId], references: [id], onDelete: Cascade)
+  to        Participant? @relation("ReceivedMessages", fields: [toId], references: [id], onDelete: Cascade)
+}
+
+enum RoomStatus {
+  ACTIVE
+  ENDED
+}
+
+enum Role {
+  HOST
+  GUEST
+  WATCHER
+}
+
+enum MessageType {
+  OFFER
+  ANSWER
+  ICE_CANDIDATE
+  JOIN
+  LEAVE
+  MUTE
+  UNMUTE
+  VIDEO_ON
+  VIDEO_OFF
 }

@@ -1,98 +1,122 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { Prisma } from "@prisma/client";
 
-// In-memory store for signaling data with TTL
-interface SignalingData {
-  type: string;
-  data: any;
-  timestamp: number;
-  ttl: number;
+// Define enums to match Prisma schema
+enum Role {
+  HOST = "HOST",
+  GUEST = "GUEST",
+  WATCHER = "WATCHER",
 }
 
-const rooms = new Map<string, Map<string, SignalingData>>();
-const ROOM_TTL = 1000 * 60 * 60; // 1 hour
-const DATA_TTL = 1000 * 30; // 30 seconds
+type MessageType =
+  | "OFFER"
+  | "ANSWER"
+  | "ICE_CANDIDATE"
+  | "JOIN"
+  | "LEAVE"
+  | "MUTE"
+  | "UNMUTE"
+  | "VIDEO_ON"
+  | "VIDEO_OFF";
 
-// Cleanup function to remove stale data
-function cleanupStaleData() {
-  const now = Date.now();
-
-  for (const [roomId, room] of rooms.entries()) {
-    // Clean up stale peer data
-    for (const [peerId, data] of room.entries()) {
-      if (now - data.timestamp > data.ttl) {
-        room.delete(peerId);
-      }
-    }
-
-    // Remove empty rooms
-    if (room.size === 0) {
-      rooms.delete(roomId);
-    }
-  }
+interface SignalingMessage {
+  type: MessageType;
+  roomId: string;
+  fromId: string;
+  toId?: string;
+  data: {
+    offer?: RTCSessionDescriptionInit;
+    answer?: RTCSessionDescriptionInit;
+    candidate?: RTCIceCandidateInit;
+    error?: string;
+  };
 }
 
-// Run cleanup every minute
-setInterval(cleanupStaleData, 60000);
-
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { roomId, type, data, from, to } = await req.json();
+    const data = await request.json();
+    console.log("Received POST request:", data);
 
-    if (!roomId || !type || !data || !from) {
+    if (!data.roomId || !data.type) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
       );
     }
 
-    // Get or create room
-    if (!rooms.has(roomId)) {
-      rooms.set(roomId, new Map());
-    }
-    const room = rooms.get(roomId)!;
-
-    // Store the signaling data with TTL
-    room.set(from, {
-      type,
-      data,
-      timestamp: Date.now(),
-      ttl: type === "ice-candidate" ? DATA_TTL : ROOM_TTL,
+    // Verify room exists
+    const room = await prisma.room.findUnique({
+      where: { id: data.roomId },
+      include: {
+        participants: true,
+      },
     });
 
-    // If this is a targeted message, only send to the specific peer
-    if (to) {
-      const targetData = room.get(to);
-      if (targetData) {
-        return NextResponse.json({
-          type: targetData.type,
-          data: targetData.data,
-          from: to,
-        });
-      }
+    if (!room) {
+      return NextResponse.json({ error: "Room not found" }, { status: 404 });
     }
 
-    // For broadcast messages, return only recent peers' data
-    const now = Date.now();
-    const peers = Array.from(room.entries())
-      .filter(
-        ([peerId, data]) => peerId !== from && now - data.timestamp <= data.ttl
-      )
-      .map(([peerId, data]) => ({
-        type: data.type,
-        data: data.data,
-        from: peerId,
-      }));
+    // Determine if this is the first participant (host)
+    const isFirstParticipant = room.participants.length === 0;
 
-    return NextResponse.json({ peers });
+    // Create or get participant
+    const participant = await prisma.participant.upsert({
+      where: {
+        userId_roomId: {
+          userId: session.user.id,
+          roomId: data.roomId,
+        },
+      },
+      create: {
+        userId: session.user.id,
+        roomId: data.roomId,
+        role: isFirstParticipant ? Role.HOST : Role.GUEST,
+      },
+      update: {
+        // Update leftAt to null if participant is rejoining
+        leftAt: null,
+      },
+    });
+
+    // For JOIN messages, just return the participant info
+    if (data.type === "JOIN") {
+      return NextResponse.json({
+        success: true,
+        message: {
+          fromId: participant.id,
+          type: "JOIN",
+          role: participant.role,
+        },
+      });
+    }
+
+    // Create signaling message
+    const message = await prisma.signalingMessage.create({
+      data: {
+        type: data.type as MessageType,
+        roomId: data.roomId,
+        fromId: participant.id,
+        toId: data.toId || null,
+        data: {
+          offer: data.offer,
+          answer: data.answer,
+          candidate: data.candidate,
+        },
+      },
+    });
+
+    console.log("Created signaling message:", message);
+    return NextResponse.json({ success: true, message });
   } catch (error) {
-    console.error("Error in signaling:", error);
+    console.error("Error in POST /api/webrtc/signal:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -100,67 +124,85 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET(req: Request) {
+export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { searchParams } = new URL(req.url);
+    const { searchParams } = new URL(request.url);
     const roomId = searchParams.get("roomId");
-    const from = searchParams.get("from");
-    const to = searchParams.get("to");
-    const lastTimestamp = searchParams.get("lastTimestamp");
 
-    if (!roomId || !from) {
+    if (!roomId) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Room ID is required" },
         { status: 400 }
       );
     }
 
-    const room = rooms.get(roomId);
-    if (!room) {
-      return NextResponse.json({ peers: [] });
-    }
-
-    // If this is a targeted message, only return data for the specific peer
-    if (to) {
-      const targetData = room.get(to);
-      if (targetData) {
-        return NextResponse.json({
-          type: targetData.type,
-          data: targetData.data,
-          from: to,
-        });
-      }
-      return NextResponse.json({});
-    }
-
-    // For broadcast messages, return only new data since last timestamp
-    const now = Date.now();
-    const lastTime = lastTimestamp ? parseInt(lastTimestamp) : 0;
-
-    const peers = Array.from(room.entries())
-      .filter(
-        ([peerId, data]) =>
-          peerId !== from &&
-          now - data.timestamp <= data.ttl &&
-          data.timestamp > lastTime
-      )
-      .map(([peerId, data]) => ({
-        type: data.type,
-        data: data.data,
-        from: peerId,
-      }));
-
-    return NextResponse.json({
-      peers,
-      timestamp: now,
+    // Get participant
+    const participant = await prisma.participant.findUnique({
+      where: {
+        userId_roomId: {
+          userId: session.user.id,
+          roomId,
+        },
+      },
     });
+
+    if (!participant) {
+      return NextResponse.json(
+        { error: "Participant not found" },
+        { status: 404 }
+      );
+    }
+
+    // Get unprocessed messages
+    const messages = await prisma.signalingMessage.findMany({
+      where: {
+        roomId,
+        processed: false,
+        OR: [
+          { toId: null }, // Broadcast messages
+          { toId: participant.id }, // Messages targeted to this participant
+        ],
+      },
+      orderBy: {
+        createdAt: "asc",
+      },
+      include: {
+        from: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                image: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Mark messages as processed
+    if (messages.length > 0) {
+      await prisma.signalingMessage.updateMany({
+        where: {
+          id: {
+            in: messages.map((m) => m.id),
+          },
+        },
+        data: {
+          processed: true,
+        },
+      });
+    }
+
+    console.log("Returning messages:", messages);
+    return NextResponse.json(messages);
   } catch (error) {
-    console.error("Error in signaling:", error);
+    console.error("Error in GET /api/webrtc/signal:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
