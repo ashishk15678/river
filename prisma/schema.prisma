@@ -60,6 +60,7 @@ model User {
   sessions       Session[]
   rooms          Room[]
   participants   Participant[]
+  settings       UserSettings?
 }
 
 model VerificationToken {
@@ -71,46 +72,65 @@ model VerificationToken {
 }
 
 model Room {
-  id            String       @id @default(cuid())
-  title         String
-  status        RoomStatus   @default(ACTIVE)
-  userId        String
-  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  participants  Participant[]
-  messages      SignalingMessage[]
-  
+  id           String     @id @default(cuid())
+  title        String
+  status       RoomStatus @default(ACTIVE)
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scheduleTime DateTime?  @default(now())
+  isDeleted    Boolean    @default(false)
+  // Duration      DateTime?
+
+  participants Participant[]
+  messages     SignalingMessage[]
+
   // Time related
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Participant {
-  id          String   @id @default(cuid())
-  userId      String
-  roomId      String
-  role        Role     @default(GUEST)
-  joinedAt    DateTime @default(now())
-  leftAt      DateTime?
-  room        Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sentMessages SignalingMessage[] @relation("SentMessages")
+  id               String             @id @default(cuid())
+  userId           String
+  roomId           String
+  role             Role               @default(GUEST)
+  joinedAt         DateTime           @default(now())
+  leftAt           DateTime?
+  room             Room               @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sentMessages     SignalingMessage[] @relation("SentMessages")
   receivedMessages SignalingMessage[] @relation("ReceivedMessages")
 
   @@unique([userId, roomId])
 }
 
 model SignalingMessage {
-  id          String   @id @default(cuid())
-  type        MessageType
-  roomId      String
-  fromId      String
-  toId        String?
-  data        Json
-  createdAt   DateTime @default(now())
-  processed   Boolean  @default(false)
-  room        Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  from        Participant @relation("SentMessages", fields: [fromId], references: [id], onDelete: Cascade)
-  to          Participant? @relation("ReceivedMessages", fields: [toId], references: [id], onDelete: Cascade)
+  id        String       @id @default(cuid())
+  type      MessageType
+  roomId    String
+  fromId    String
+  toId      String?
+  data      Json
+  createdAt DateTime     @default(now())
+  processed Boolean      @default(false)
+  room      Room         @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  from      Participant  @relation("SentMessages", fields: [fromId], references: [id], onDelete: Cascade)
+  to        Participant? @relation("ReceivedMessages", fields: [toId], references: [id], onDelete: Cascade)
+}
+
+model UserSettings {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailNotifications Boolean  @default(true)
+  pushNotifications  Boolean  @default(true)
+  theme              String   @default("system")
+  language           String   @default("en")
+  timezone           String   @default("UTC")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@map("user_settings")
 }
 
 enum RoomStatus {

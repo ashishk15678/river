@@ -44,16 +44,6 @@ export type Room = $Result.DefaultSelection<Prisma.$RoomPayload>
  */
 export type Participant = $Result.DefaultSelection<Prisma.$ParticipantPayload>
 /**
- * Model Offer
- * 
- */
-export type Offer = $Result.DefaultSelection<Prisma.$OfferPayload>
-/**
- * Model IceCandidate
- * 
- */
-export type IceCandidate = $Result.DefaultSelection<Prisma.$IceCandidatePayload>
-/**
  * Model SignalingMessage
  * 
  */
@@ -292,26 +282,6 @@ export class PrismaClient<
     * ```
     */
   get participant(): Prisma.ParticipantDelegate<ExtArgs, ClientOptions>;
-
-  /**
-   * `prisma.offer`: Exposes CRUD operations for the **Offer** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more Offers
-    * const offers = await prisma.offer.findMany()
-    * ```
-    */
-  get offer(): Prisma.OfferDelegate<ExtArgs, ClientOptions>;
-
-  /**
-   * `prisma.iceCandidate`: Exposes CRUD operations for the **IceCandidate** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more IceCandidates
-    * const iceCandidates = await prisma.iceCandidate.findMany()
-    * ```
-    */
-  get iceCandidate(): Prisma.IceCandidateDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.signalingMessage`: Exposes CRUD operations for the **SignalingMessage** model.
@@ -768,8 +738,6 @@ export namespace Prisma {
     VerificationToken: 'VerificationToken',
     Room: 'Room',
     Participant: 'Participant',
-    Offer: 'Offer',
-    IceCandidate: 'IceCandidate',
     SignalingMessage: 'SignalingMessage'
   };
 
@@ -789,7 +757,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "account" | "session" | "user" | "verificationToken" | "room" | "participant" | "offer" | "iceCandidate" | "signalingMessage"
+      modelProps: "account" | "session" | "user" | "verificationToken" | "room" | "participant" | "signalingMessage"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1237,154 +1205,6 @@ export namespace Prisma {
           }
         }
       }
-      Offer: {
-        payload: Prisma.$OfferPayload<ExtArgs>
-        fields: Prisma.OfferFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.OfferFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$OfferPayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.OfferFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$OfferPayload>
-          }
-          findFirst: {
-            args: Prisma.OfferFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$OfferPayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.OfferFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$OfferPayload>
-          }
-          findMany: {
-            args: Prisma.OfferFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$OfferPayload>[]
-          }
-          create: {
-            args: Prisma.OfferCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$OfferPayload>
-          }
-          createMany: {
-            args: Prisma.OfferCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.OfferCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$OfferPayload>[]
-          }
-          delete: {
-            args: Prisma.OfferDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$OfferPayload>
-          }
-          update: {
-            args: Prisma.OfferUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$OfferPayload>
-          }
-          deleteMany: {
-            args: Prisma.OfferDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.OfferUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.OfferUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$OfferPayload>[]
-          }
-          upsert: {
-            args: Prisma.OfferUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$OfferPayload>
-          }
-          aggregate: {
-            args: Prisma.OfferAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateOffer>
-          }
-          groupBy: {
-            args: Prisma.OfferGroupByArgs<ExtArgs>
-            result: $Utils.Optional<OfferGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.OfferCountArgs<ExtArgs>
-            result: $Utils.Optional<OfferCountAggregateOutputType> | number
-          }
-        }
-      }
-      IceCandidate: {
-        payload: Prisma.$IceCandidatePayload<ExtArgs>
-        fields: Prisma.IceCandidateFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.IceCandidateFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$IceCandidatePayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.IceCandidateFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$IceCandidatePayload>
-          }
-          findFirst: {
-            args: Prisma.IceCandidateFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$IceCandidatePayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.IceCandidateFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$IceCandidatePayload>
-          }
-          findMany: {
-            args: Prisma.IceCandidateFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$IceCandidatePayload>[]
-          }
-          create: {
-            args: Prisma.IceCandidateCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$IceCandidatePayload>
-          }
-          createMany: {
-            args: Prisma.IceCandidateCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.IceCandidateCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$IceCandidatePayload>[]
-          }
-          delete: {
-            args: Prisma.IceCandidateDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$IceCandidatePayload>
-          }
-          update: {
-            args: Prisma.IceCandidateUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$IceCandidatePayload>
-          }
-          deleteMany: {
-            args: Prisma.IceCandidateDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.IceCandidateUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.IceCandidateUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$IceCandidatePayload>[]
-          }
-          upsert: {
-            args: Prisma.IceCandidateUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$IceCandidatePayload>
-          }
-          aggregate: {
-            args: Prisma.IceCandidateAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateIceCandidate>
-          }
-          groupBy: {
-            args: Prisma.IceCandidateGroupByArgs<ExtArgs>
-            result: $Utils.Optional<IceCandidateGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.IceCandidateCountArgs<ExtArgs>
-            result: $Utils.Optional<IceCandidateCountAggregateOutputType> | number
-          }
-        }
-      }
       SignalingMessage: {
         payload: Prisma.$SignalingMessagePayload<ExtArgs>
         fields: Prisma.SignalingMessageFieldRefs
@@ -1549,8 +1369,6 @@ export namespace Prisma {
     verificationToken?: VerificationTokenOmit
     room?: RoomOmit
     participant?: ParticipantOmit
-    offer?: OfferOmit
-    iceCandidate?: IceCandidateOmit
     signalingMessage?: SignalingMessageOmit
   }
 
@@ -1706,15 +1524,11 @@ export namespace Prisma {
   export type RoomCountOutputType = {
     participants: number
     messages: number
-    offers: number
-    iceCandidates: number
   }
 
   export type RoomCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     participants?: boolean | RoomCountOutputTypeCountParticipantsArgs
     messages?: boolean | RoomCountOutputTypeCountMessagesArgs
-    offers?: boolean | RoomCountOutputTypeCountOffersArgs
-    iceCandidates?: boolean | RoomCountOutputTypeCountIceCandidatesArgs
   }
 
   // Custom InputTypes
@@ -1742,20 +1556,6 @@ export namespace Prisma {
     where?: SignalingMessageWhereInput
   }
 
-  /**
-   * RoomCountOutputType without action
-   */
-  export type RoomCountOutputTypeCountOffersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: OfferWhereInput
-  }
-
-  /**
-   * RoomCountOutputType without action
-   */
-  export type RoomCountOutputTypeCountIceCandidatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: IceCandidateWhereInput
-  }
-
 
   /**
    * Count Type ParticipantCountOutputType
@@ -1764,13 +1564,11 @@ export namespace Prisma {
   export type ParticipantCountOutputType = {
     sentMessages: number
     receivedMessages: number
-    iceCandidates: number
   }
 
   export type ParticipantCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     sentMessages?: boolean | ParticipantCountOutputTypeCountSentMessagesArgs
     receivedMessages?: boolean | ParticipantCountOutputTypeCountReceivedMessagesArgs
-    iceCandidates?: boolean | ParticipantCountOutputTypeCountIceCandidatesArgs
   }
 
   // Custom InputTypes
@@ -1796,13 +1594,6 @@ export namespace Prisma {
    */
   export type ParticipantCountOutputTypeCountReceivedMessagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: SignalingMessageWhereInput
-  }
-
-  /**
-   * ParticipantCountOutputType without action
-   */
-  export type ParticipantCountOutputTypeCountIceCandidatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: IceCandidateWhereInput
   }
 
 
@@ -6293,6 +6084,8 @@ export namespace Prisma {
     title: string | null
     status: $Enums.RoomStatus | null
     userId: string | null
+    scheduleTime: Date | null
+    isDeleted: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -6302,6 +6095,8 @@ export namespace Prisma {
     title: string | null
     status: $Enums.RoomStatus | null
     userId: string | null
+    scheduleTime: Date | null
+    isDeleted: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -6311,6 +6106,8 @@ export namespace Prisma {
     title: number
     status: number
     userId: number
+    scheduleTime: number
+    isDeleted: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -6322,6 +6119,8 @@ export namespace Prisma {
     title?: true
     status?: true
     userId?: true
+    scheduleTime?: true
+    isDeleted?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -6331,6 +6130,8 @@ export namespace Prisma {
     title?: true
     status?: true
     userId?: true
+    scheduleTime?: true
+    isDeleted?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -6340,6 +6141,8 @@ export namespace Prisma {
     title?: true
     status?: true
     userId?: true
+    scheduleTime?: true
+    isDeleted?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -6422,6 +6225,8 @@ export namespace Prisma {
     title: string
     status: $Enums.RoomStatus
     userId: string
+    scheduleTime: Date | null
+    isDeleted: boolean
     createdAt: Date
     updatedAt: Date
     _count: RoomCountAggregateOutputType | null
@@ -6448,13 +6253,13 @@ export namespace Prisma {
     title?: boolean
     status?: boolean
     userId?: boolean
+    scheduleTime?: boolean
+    isDeleted?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     participants?: boolean | Room$participantsArgs<ExtArgs>
     messages?: boolean | Room$messagesArgs<ExtArgs>
-    offers?: boolean | Room$offersArgs<ExtArgs>
-    iceCandidates?: boolean | Room$iceCandidatesArgs<ExtArgs>
     _count?: boolean | RoomCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["room"]>
 
@@ -6463,6 +6268,8 @@ export namespace Prisma {
     title?: boolean
     status?: boolean
     userId?: boolean
+    scheduleTime?: boolean
+    isDeleted?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -6473,6 +6280,8 @@ export namespace Prisma {
     title?: boolean
     status?: boolean
     userId?: boolean
+    scheduleTime?: boolean
+    isDeleted?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -6483,17 +6292,17 @@ export namespace Prisma {
     title?: boolean
     status?: boolean
     userId?: boolean
+    scheduleTime?: boolean
+    isDeleted?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type RoomOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "status" | "userId" | "createdAt" | "updatedAt", ExtArgs["result"]["room"]>
+  export type RoomOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "status" | "userId" | "scheduleTime" | "isDeleted" | "createdAt" | "updatedAt", ExtArgs["result"]["room"]>
   export type RoomInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     participants?: boolean | Room$participantsArgs<ExtArgs>
     messages?: boolean | Room$messagesArgs<ExtArgs>
-    offers?: boolean | Room$offersArgs<ExtArgs>
-    iceCandidates?: boolean | Room$iceCandidatesArgs<ExtArgs>
     _count?: boolean | RoomCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type RoomIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6509,14 +6318,14 @@ export namespace Prisma {
       user: Prisma.$UserPayload<ExtArgs>
       participants: Prisma.$ParticipantPayload<ExtArgs>[]
       messages: Prisma.$SignalingMessagePayload<ExtArgs>[]
-      offers: Prisma.$OfferPayload<ExtArgs>[]
-      iceCandidates: Prisma.$IceCandidatePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       title: string
       status: $Enums.RoomStatus
       userId: string
+      scheduleTime: Date | null
+      isDeleted: boolean
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["room"]>
@@ -6916,8 +6725,6 @@ export namespace Prisma {
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     participants<T extends Room$participantsArgs<ExtArgs> = {}>(args?: Subset<T, Room$participantsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ParticipantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     messages<T extends Room$messagesArgs<ExtArgs> = {}>(args?: Subset<T, Room$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SignalingMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    offers<T extends Room$offersArgs<ExtArgs> = {}>(args?: Subset<T, Room$offersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OfferPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    iceCandidates<T extends Room$iceCandidatesArgs<ExtArgs> = {}>(args?: Subset<T, Room$iceCandidatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$IceCandidatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6951,6 +6758,8 @@ export namespace Prisma {
     readonly title: FieldRef<"Room", 'String'>
     readonly status: FieldRef<"Room", 'RoomStatus'>
     readonly userId: FieldRef<"Room", 'String'>
+    readonly scheduleTime: FieldRef<"Room", 'DateTime'>
+    readonly isDeleted: FieldRef<"Room", 'Boolean'>
     readonly createdAt: FieldRef<"Room", 'DateTime'>
     readonly updatedAt: FieldRef<"Room", 'DateTime'>
   }
@@ -7397,54 +7206,6 @@ export namespace Prisma {
   }
 
   /**
-   * Room.offers
-   */
-  export type Room$offersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Offer
-     */
-    select?: OfferSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Offer
-     */
-    omit?: OfferOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: OfferInclude<ExtArgs> | null
-    where?: OfferWhereInput
-    orderBy?: OfferOrderByWithRelationInput | OfferOrderByWithRelationInput[]
-    cursor?: OfferWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: OfferScalarFieldEnum | OfferScalarFieldEnum[]
-  }
-
-  /**
-   * Room.iceCandidates
-   */
-  export type Room$iceCandidatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the IceCandidate
-     */
-    select?: IceCandidateSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the IceCandidate
-     */
-    omit?: IceCandidateOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: IceCandidateInclude<ExtArgs> | null
-    where?: IceCandidateWhereInput
-    orderBy?: IceCandidateOrderByWithRelationInput | IceCandidateOrderByWithRelationInput[]
-    cursor?: IceCandidateWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: IceCandidateScalarFieldEnum | IceCandidateScalarFieldEnum[]
-  }
-
-  /**
    * Room without action
    */
   export type RoomDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7639,7 +7400,6 @@ export namespace Prisma {
     user?: boolean | UserDefaultArgs<ExtArgs>
     sentMessages?: boolean | Participant$sentMessagesArgs<ExtArgs>
     receivedMessages?: boolean | Participant$receivedMessagesArgs<ExtArgs>
-    iceCandidates?: boolean | Participant$iceCandidatesArgs<ExtArgs>
     _count?: boolean | ParticipantCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["participant"]>
 
@@ -7680,7 +7440,6 @@ export namespace Prisma {
     user?: boolean | UserDefaultArgs<ExtArgs>
     sentMessages?: boolean | Participant$sentMessagesArgs<ExtArgs>
     receivedMessages?: boolean | Participant$receivedMessagesArgs<ExtArgs>
-    iceCandidates?: boolean | Participant$iceCandidatesArgs<ExtArgs>
     _count?: boolean | ParticipantCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ParticipantIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7699,7 +7458,6 @@ export namespace Prisma {
       user: Prisma.$UserPayload<ExtArgs>
       sentMessages: Prisma.$SignalingMessagePayload<ExtArgs>[]
       receivedMessages: Prisma.$SignalingMessagePayload<ExtArgs>[]
-      iceCandidates: Prisma.$IceCandidatePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -8106,7 +7864,6 @@ export namespace Prisma {
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     sentMessages<T extends Participant$sentMessagesArgs<ExtArgs> = {}>(args?: Subset<T, Participant$sentMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SignalingMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     receivedMessages<T extends Participant$receivedMessagesArgs<ExtArgs> = {}>(args?: Subset<T, Participant$receivedMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SignalingMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    iceCandidates<T extends Participant$iceCandidatesArgs<ExtArgs> = {}>(args?: Subset<T, Participant$iceCandidatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$IceCandidatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8586,30 +8343,6 @@ export namespace Prisma {
   }
 
   /**
-   * Participant.iceCandidates
-   */
-  export type Participant$iceCandidatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the IceCandidate
-     */
-    select?: IceCandidateSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the IceCandidate
-     */
-    omit?: IceCandidateOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: IceCandidateInclude<ExtArgs> | null
-    where?: IceCandidateWhereInput
-    orderBy?: IceCandidateOrderByWithRelationInput | IceCandidateOrderByWithRelationInput[]
-    cursor?: IceCandidateWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: IceCandidateScalarFieldEnum | IceCandidateScalarFieldEnum[]
-  }
-
-  /**
    * Participant without action
    */
   export type ParticipantDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -8625,2136 +8358,6 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: ParticipantInclude<ExtArgs> | null
-  }
-
-
-  /**
-   * Model Offer
-   */
-
-  export type AggregateOffer = {
-    _count: OfferCountAggregateOutputType | null
-    _min: OfferMinAggregateOutputType | null
-    _max: OfferMaxAggregateOutputType | null
-  }
-
-  export type OfferMinAggregateOutputType = {
-    id: string | null
-    roomId: string | null
-    sdp: string | null
-    createdAt: Date | null
-  }
-
-  export type OfferMaxAggregateOutputType = {
-    id: string | null
-    roomId: string | null
-    sdp: string | null
-    createdAt: Date | null
-  }
-
-  export type OfferCountAggregateOutputType = {
-    id: number
-    roomId: number
-    sdp: number
-    createdAt: number
-    _all: number
-  }
-
-
-  export type OfferMinAggregateInputType = {
-    id?: true
-    roomId?: true
-    sdp?: true
-    createdAt?: true
-  }
-
-  export type OfferMaxAggregateInputType = {
-    id?: true
-    roomId?: true
-    sdp?: true
-    createdAt?: true
-  }
-
-  export type OfferCountAggregateInputType = {
-    id?: true
-    roomId?: true
-    sdp?: true
-    createdAt?: true
-    _all?: true
-  }
-
-  export type OfferAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which Offer to aggregate.
-     */
-    where?: OfferWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Offers to fetch.
-     */
-    orderBy?: OfferOrderByWithRelationInput | OfferOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: OfferWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Offers from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Offers.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned Offers
-    **/
-    _count?: true | OfferCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: OfferMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: OfferMaxAggregateInputType
-  }
-
-  export type GetOfferAggregateType<T extends OfferAggregateArgs> = {
-        [P in keyof T & keyof AggregateOffer]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateOffer[P]>
-      : GetScalarType<T[P], AggregateOffer[P]>
-  }
-
-
-
-
-  export type OfferGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: OfferWhereInput
-    orderBy?: OfferOrderByWithAggregationInput | OfferOrderByWithAggregationInput[]
-    by: OfferScalarFieldEnum[] | OfferScalarFieldEnum
-    having?: OfferScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: OfferCountAggregateInputType | true
-    _min?: OfferMinAggregateInputType
-    _max?: OfferMaxAggregateInputType
-  }
-
-  export type OfferGroupByOutputType = {
-    id: string
-    roomId: string
-    sdp: string
-    createdAt: Date
-    _count: OfferCountAggregateOutputType | null
-    _min: OfferMinAggregateOutputType | null
-    _max: OfferMaxAggregateOutputType | null
-  }
-
-  type GetOfferGroupByPayload<T extends OfferGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<OfferGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof OfferGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], OfferGroupByOutputType[P]>
-            : GetScalarType<T[P], OfferGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type OfferSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    roomId?: boolean
-    sdp?: boolean
-    createdAt?: boolean
-    room?: boolean | RoomDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["offer"]>
-
-  export type OfferSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    roomId?: boolean
-    sdp?: boolean
-    createdAt?: boolean
-    room?: boolean | RoomDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["offer"]>
-
-  export type OfferSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    roomId?: boolean
-    sdp?: boolean
-    createdAt?: boolean
-    room?: boolean | RoomDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["offer"]>
-
-  export type OfferSelectScalar = {
-    id?: boolean
-    roomId?: boolean
-    sdp?: boolean
-    createdAt?: boolean
-  }
-
-  export type OfferOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "roomId" | "sdp" | "createdAt", ExtArgs["result"]["offer"]>
-  export type OfferInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    room?: boolean | RoomDefaultArgs<ExtArgs>
-  }
-  export type OfferIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    room?: boolean | RoomDefaultArgs<ExtArgs>
-  }
-  export type OfferIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    room?: boolean | RoomDefaultArgs<ExtArgs>
-  }
-
-  export type $OfferPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "Offer"
-    objects: {
-      room: Prisma.$RoomPayload<ExtArgs>
-    }
-    scalars: $Extensions.GetPayloadResult<{
-      id: string
-      roomId: string
-      sdp: string
-      createdAt: Date
-    }, ExtArgs["result"]["offer"]>
-    composites: {}
-  }
-
-  type OfferGetPayload<S extends boolean | null | undefined | OfferDefaultArgs> = $Result.GetResult<Prisma.$OfferPayload, S>
-
-  type OfferCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<OfferFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: OfferCountAggregateInputType | true
-    }
-
-  export interface OfferDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Offer'], meta: { name: 'Offer' } }
-    /**
-     * Find zero or one Offer that matches the filter.
-     * @param {OfferFindUniqueArgs} args - Arguments to find a Offer
-     * @example
-     * // Get one Offer
-     * const offer = await prisma.offer.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends OfferFindUniqueArgs>(args: SelectSubset<T, OfferFindUniqueArgs<ExtArgs>>): Prisma__OfferClient<$Result.GetResult<Prisma.$OfferPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find one Offer that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {OfferFindUniqueOrThrowArgs} args - Arguments to find a Offer
-     * @example
-     * // Get one Offer
-     * const offer = await prisma.offer.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends OfferFindUniqueOrThrowArgs>(args: SelectSubset<T, OfferFindUniqueOrThrowArgs<ExtArgs>>): Prisma__OfferClient<$Result.GetResult<Prisma.$OfferPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first Offer that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {OfferFindFirstArgs} args - Arguments to find a Offer
-     * @example
-     * // Get one Offer
-     * const offer = await prisma.offer.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends OfferFindFirstArgs>(args?: SelectSubset<T, OfferFindFirstArgs<ExtArgs>>): Prisma__OfferClient<$Result.GetResult<Prisma.$OfferPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first Offer that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {OfferFindFirstOrThrowArgs} args - Arguments to find a Offer
-     * @example
-     * // Get one Offer
-     * const offer = await prisma.offer.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends OfferFindFirstOrThrowArgs>(args?: SelectSubset<T, OfferFindFirstOrThrowArgs<ExtArgs>>): Prisma__OfferClient<$Result.GetResult<Prisma.$OfferPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find zero or more Offers that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {OfferFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all Offers
-     * const offers = await prisma.offer.findMany()
-     * 
-     * // Get first 10 Offers
-     * const offers = await prisma.offer.findMany({ take: 10 })
-     * 
-     * // Only select the `id`
-     * const offerWithIdOnly = await prisma.offer.findMany({ select: { id: true } })
-     * 
-     */
-    findMany<T extends OfferFindManyArgs>(args?: SelectSubset<T, OfferFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OfferPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
-
-    /**
-     * Create a Offer.
-     * @param {OfferCreateArgs} args - Arguments to create a Offer.
-     * @example
-     * // Create one Offer
-     * const Offer = await prisma.offer.create({
-     *   data: {
-     *     // ... data to create a Offer
-     *   }
-     * })
-     * 
-     */
-    create<T extends OfferCreateArgs>(args: SelectSubset<T, OfferCreateArgs<ExtArgs>>): Prisma__OfferClient<$Result.GetResult<Prisma.$OfferPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Create many Offers.
-     * @param {OfferCreateManyArgs} args - Arguments to create many Offers.
-     * @example
-     * // Create many Offers
-     * const offer = await prisma.offer.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends OfferCreateManyArgs>(args?: SelectSubset<T, OfferCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many Offers and returns the data saved in the database.
-     * @param {OfferCreateManyAndReturnArgs} args - Arguments to create many Offers.
-     * @example
-     * // Create many Offers
-     * const offer = await prisma.offer.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many Offers and only return the `id`
-     * const offerWithIdOnly = await prisma.offer.createManyAndReturn({
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends OfferCreateManyAndReturnArgs>(args?: SelectSubset<T, OfferCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OfferPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Delete a Offer.
-     * @param {OfferDeleteArgs} args - Arguments to delete one Offer.
-     * @example
-     * // Delete one Offer
-     * const Offer = await prisma.offer.delete({
-     *   where: {
-     *     // ... filter to delete one Offer
-     *   }
-     * })
-     * 
-     */
-    delete<T extends OfferDeleteArgs>(args: SelectSubset<T, OfferDeleteArgs<ExtArgs>>): Prisma__OfferClient<$Result.GetResult<Prisma.$OfferPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Update one Offer.
-     * @param {OfferUpdateArgs} args - Arguments to update one Offer.
-     * @example
-     * // Update one Offer
-     * const offer = await prisma.offer.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends OfferUpdateArgs>(args: SelectSubset<T, OfferUpdateArgs<ExtArgs>>): Prisma__OfferClient<$Result.GetResult<Prisma.$OfferPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Delete zero or more Offers.
-     * @param {OfferDeleteManyArgs} args - Arguments to filter Offers to delete.
-     * @example
-     * // Delete a few Offers
-     * const { count } = await prisma.offer.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends OfferDeleteManyArgs>(args?: SelectSubset<T, OfferDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more Offers.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {OfferUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many Offers
-     * const offer = await prisma.offer.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends OfferUpdateManyArgs>(args: SelectSubset<T, OfferUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more Offers and returns the data updated in the database.
-     * @param {OfferUpdateManyAndReturnArgs} args - Arguments to update many Offers.
-     * @example
-     * // Update many Offers
-     * const offer = await prisma.offer.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more Offers and only return the `id`
-     * const offerWithIdOnly = await prisma.offer.updateManyAndReturn({
-     *   select: { id: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends OfferUpdateManyAndReturnArgs>(args: SelectSubset<T, OfferUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OfferPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Create or update one Offer.
-     * @param {OfferUpsertArgs} args - Arguments to update or create a Offer.
-     * @example
-     * // Update or create a Offer
-     * const offer = await prisma.offer.upsert({
-     *   create: {
-     *     // ... data to create a Offer
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the Offer we want to update
-     *   }
-     * })
-     */
-    upsert<T extends OfferUpsertArgs>(args: SelectSubset<T, OfferUpsertArgs<ExtArgs>>): Prisma__OfferClient<$Result.GetResult<Prisma.$OfferPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-
-    /**
-     * Count the number of Offers.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {OfferCountArgs} args - Arguments to filter Offers to count.
-     * @example
-     * // Count the number of Offers
-     * const count = await prisma.offer.count({
-     *   where: {
-     *     // ... the filter for the Offers we want to count
-     *   }
-     * })
-    **/
-    count<T extends OfferCountArgs>(
-      args?: Subset<T, OfferCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], OfferCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a Offer.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {OfferAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends OfferAggregateArgs>(args: Subset<T, OfferAggregateArgs>): Prisma.PrismaPromise<GetOfferAggregateType<T>>
-
-    /**
-     * Group by Offer.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {OfferGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends OfferGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: OfferGroupByArgs['orderBy'] }
-        : { orderBy?: OfferGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, OfferGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetOfferGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the Offer model
-   */
-  readonly fields: OfferFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for Offer.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__OfferClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    room<T extends RoomDefaultArgs<ExtArgs> = {}>(args?: Subset<T, RoomDefaultArgs<ExtArgs>>): Prisma__RoomClient<$Result.GetResult<Prisma.$RoomPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the Offer model
-   */
-  interface OfferFieldRefs {
-    readonly id: FieldRef<"Offer", 'String'>
-    readonly roomId: FieldRef<"Offer", 'String'>
-    readonly sdp: FieldRef<"Offer", 'String'>
-    readonly createdAt: FieldRef<"Offer", 'DateTime'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * Offer findUnique
-   */
-  export type OfferFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Offer
-     */
-    select?: OfferSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Offer
-     */
-    omit?: OfferOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: OfferInclude<ExtArgs> | null
-    /**
-     * Filter, which Offer to fetch.
-     */
-    where: OfferWhereUniqueInput
-  }
-
-  /**
-   * Offer findUniqueOrThrow
-   */
-  export type OfferFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Offer
-     */
-    select?: OfferSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Offer
-     */
-    omit?: OfferOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: OfferInclude<ExtArgs> | null
-    /**
-     * Filter, which Offer to fetch.
-     */
-    where: OfferWhereUniqueInput
-  }
-
-  /**
-   * Offer findFirst
-   */
-  export type OfferFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Offer
-     */
-    select?: OfferSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Offer
-     */
-    omit?: OfferOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: OfferInclude<ExtArgs> | null
-    /**
-     * Filter, which Offer to fetch.
-     */
-    where?: OfferWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Offers to fetch.
-     */
-    orderBy?: OfferOrderByWithRelationInput | OfferOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for Offers.
-     */
-    cursor?: OfferWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Offers from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Offers.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of Offers.
-     */
-    distinct?: OfferScalarFieldEnum | OfferScalarFieldEnum[]
-  }
-
-  /**
-   * Offer findFirstOrThrow
-   */
-  export type OfferFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Offer
-     */
-    select?: OfferSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Offer
-     */
-    omit?: OfferOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: OfferInclude<ExtArgs> | null
-    /**
-     * Filter, which Offer to fetch.
-     */
-    where?: OfferWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Offers to fetch.
-     */
-    orderBy?: OfferOrderByWithRelationInput | OfferOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for Offers.
-     */
-    cursor?: OfferWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Offers from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Offers.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of Offers.
-     */
-    distinct?: OfferScalarFieldEnum | OfferScalarFieldEnum[]
-  }
-
-  /**
-   * Offer findMany
-   */
-  export type OfferFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Offer
-     */
-    select?: OfferSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Offer
-     */
-    omit?: OfferOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: OfferInclude<ExtArgs> | null
-    /**
-     * Filter, which Offers to fetch.
-     */
-    where?: OfferWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Offers to fetch.
-     */
-    orderBy?: OfferOrderByWithRelationInput | OfferOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing Offers.
-     */
-    cursor?: OfferWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Offers from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Offers.
-     */
-    skip?: number
-    distinct?: OfferScalarFieldEnum | OfferScalarFieldEnum[]
-  }
-
-  /**
-   * Offer create
-   */
-  export type OfferCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Offer
-     */
-    select?: OfferSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Offer
-     */
-    omit?: OfferOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: OfferInclude<ExtArgs> | null
-    /**
-     * The data needed to create a Offer.
-     */
-    data: XOR<OfferCreateInput, OfferUncheckedCreateInput>
-  }
-
-  /**
-   * Offer createMany
-   */
-  export type OfferCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many Offers.
-     */
-    data: OfferCreateManyInput | OfferCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * Offer createManyAndReturn
-   */
-  export type OfferCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Offer
-     */
-    select?: OfferSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the Offer
-     */
-    omit?: OfferOmit<ExtArgs> | null
-    /**
-     * The data used to create many Offers.
-     */
-    data: OfferCreateManyInput | OfferCreateManyInput[]
-    skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: OfferIncludeCreateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * Offer update
-   */
-  export type OfferUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Offer
-     */
-    select?: OfferSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Offer
-     */
-    omit?: OfferOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: OfferInclude<ExtArgs> | null
-    /**
-     * The data needed to update a Offer.
-     */
-    data: XOR<OfferUpdateInput, OfferUncheckedUpdateInput>
-    /**
-     * Choose, which Offer to update.
-     */
-    where: OfferWhereUniqueInput
-  }
-
-  /**
-   * Offer updateMany
-   */
-  export type OfferUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update Offers.
-     */
-    data: XOR<OfferUpdateManyMutationInput, OfferUncheckedUpdateManyInput>
-    /**
-     * Filter which Offers to update
-     */
-    where?: OfferWhereInput
-    /**
-     * Limit how many Offers to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * Offer updateManyAndReturn
-   */
-  export type OfferUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Offer
-     */
-    select?: OfferSelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the Offer
-     */
-    omit?: OfferOmit<ExtArgs> | null
-    /**
-     * The data used to update Offers.
-     */
-    data: XOR<OfferUpdateManyMutationInput, OfferUncheckedUpdateManyInput>
-    /**
-     * Filter which Offers to update
-     */
-    where?: OfferWhereInput
-    /**
-     * Limit how many Offers to update.
-     */
-    limit?: number
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: OfferIncludeUpdateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * Offer upsert
-   */
-  export type OfferUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Offer
-     */
-    select?: OfferSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Offer
-     */
-    omit?: OfferOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: OfferInclude<ExtArgs> | null
-    /**
-     * The filter to search for the Offer to update in case it exists.
-     */
-    where: OfferWhereUniqueInput
-    /**
-     * In case the Offer found by the `where` argument doesn't exist, create a new Offer with this data.
-     */
-    create: XOR<OfferCreateInput, OfferUncheckedCreateInput>
-    /**
-     * In case the Offer was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<OfferUpdateInput, OfferUncheckedUpdateInput>
-  }
-
-  /**
-   * Offer delete
-   */
-  export type OfferDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Offer
-     */
-    select?: OfferSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Offer
-     */
-    omit?: OfferOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: OfferInclude<ExtArgs> | null
-    /**
-     * Filter which Offer to delete.
-     */
-    where: OfferWhereUniqueInput
-  }
-
-  /**
-   * Offer deleteMany
-   */
-  export type OfferDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which Offers to delete
-     */
-    where?: OfferWhereInput
-    /**
-     * Limit how many Offers to delete.
-     */
-    limit?: number
-  }
-
-  /**
-   * Offer without action
-   */
-  export type OfferDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Offer
-     */
-    select?: OfferSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Offer
-     */
-    omit?: OfferOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: OfferInclude<ExtArgs> | null
-  }
-
-
-  /**
-   * Model IceCandidate
-   */
-
-  export type AggregateIceCandidate = {
-    _count: IceCandidateCountAggregateOutputType | null
-    _min: IceCandidateMinAggregateOutputType | null
-    _max: IceCandidateMaxAggregateOutputType | null
-  }
-
-  export type IceCandidateMinAggregateOutputType = {
-    id: string | null
-    roomId: string | null
-    candidate: string | null
-    clientId: string | null
-    createdAt: Date | null
-  }
-
-  export type IceCandidateMaxAggregateOutputType = {
-    id: string | null
-    roomId: string | null
-    candidate: string | null
-    clientId: string | null
-    createdAt: Date | null
-  }
-
-  export type IceCandidateCountAggregateOutputType = {
-    id: number
-    roomId: number
-    candidate: number
-    clientId: number
-    createdAt: number
-    _all: number
-  }
-
-
-  export type IceCandidateMinAggregateInputType = {
-    id?: true
-    roomId?: true
-    candidate?: true
-    clientId?: true
-    createdAt?: true
-  }
-
-  export type IceCandidateMaxAggregateInputType = {
-    id?: true
-    roomId?: true
-    candidate?: true
-    clientId?: true
-    createdAt?: true
-  }
-
-  export type IceCandidateCountAggregateInputType = {
-    id?: true
-    roomId?: true
-    candidate?: true
-    clientId?: true
-    createdAt?: true
-    _all?: true
-  }
-
-  export type IceCandidateAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which IceCandidate to aggregate.
-     */
-    where?: IceCandidateWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of IceCandidates to fetch.
-     */
-    orderBy?: IceCandidateOrderByWithRelationInput | IceCandidateOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: IceCandidateWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` IceCandidates from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` IceCandidates.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned IceCandidates
-    **/
-    _count?: true | IceCandidateCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: IceCandidateMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: IceCandidateMaxAggregateInputType
-  }
-
-  export type GetIceCandidateAggregateType<T extends IceCandidateAggregateArgs> = {
-        [P in keyof T & keyof AggregateIceCandidate]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateIceCandidate[P]>
-      : GetScalarType<T[P], AggregateIceCandidate[P]>
-  }
-
-
-
-
-  export type IceCandidateGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: IceCandidateWhereInput
-    orderBy?: IceCandidateOrderByWithAggregationInput | IceCandidateOrderByWithAggregationInput[]
-    by: IceCandidateScalarFieldEnum[] | IceCandidateScalarFieldEnum
-    having?: IceCandidateScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: IceCandidateCountAggregateInputType | true
-    _min?: IceCandidateMinAggregateInputType
-    _max?: IceCandidateMaxAggregateInputType
-  }
-
-  export type IceCandidateGroupByOutputType = {
-    id: string
-    roomId: string
-    candidate: string
-    clientId: string
-    createdAt: Date
-    _count: IceCandidateCountAggregateOutputType | null
-    _min: IceCandidateMinAggregateOutputType | null
-    _max: IceCandidateMaxAggregateOutputType | null
-  }
-
-  type GetIceCandidateGroupByPayload<T extends IceCandidateGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<IceCandidateGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof IceCandidateGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], IceCandidateGroupByOutputType[P]>
-            : GetScalarType<T[P], IceCandidateGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type IceCandidateSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    roomId?: boolean
-    candidate?: boolean
-    clientId?: boolean
-    createdAt?: boolean
-    room?: boolean | RoomDefaultArgs<ExtArgs>
-    participant?: boolean | IceCandidate$participantArgs<ExtArgs>
-  }, ExtArgs["result"]["iceCandidate"]>
-
-  export type IceCandidateSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    roomId?: boolean
-    candidate?: boolean
-    clientId?: boolean
-    createdAt?: boolean
-    room?: boolean | RoomDefaultArgs<ExtArgs>
-    participant?: boolean | IceCandidate$participantArgs<ExtArgs>
-  }, ExtArgs["result"]["iceCandidate"]>
-
-  export type IceCandidateSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    roomId?: boolean
-    candidate?: boolean
-    clientId?: boolean
-    createdAt?: boolean
-    room?: boolean | RoomDefaultArgs<ExtArgs>
-    participant?: boolean | IceCandidate$participantArgs<ExtArgs>
-  }, ExtArgs["result"]["iceCandidate"]>
-
-  export type IceCandidateSelectScalar = {
-    id?: boolean
-    roomId?: boolean
-    candidate?: boolean
-    clientId?: boolean
-    createdAt?: boolean
-  }
-
-  export type IceCandidateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "roomId" | "candidate" | "clientId" | "createdAt", ExtArgs["result"]["iceCandidate"]>
-  export type IceCandidateInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    room?: boolean | RoomDefaultArgs<ExtArgs>
-    participant?: boolean | IceCandidate$participantArgs<ExtArgs>
-  }
-  export type IceCandidateIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    room?: boolean | RoomDefaultArgs<ExtArgs>
-    participant?: boolean | IceCandidate$participantArgs<ExtArgs>
-  }
-  export type IceCandidateIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    room?: boolean | RoomDefaultArgs<ExtArgs>
-    participant?: boolean | IceCandidate$participantArgs<ExtArgs>
-  }
-
-  export type $IceCandidatePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "IceCandidate"
-    objects: {
-      room: Prisma.$RoomPayload<ExtArgs>
-      participant: Prisma.$ParticipantPayload<ExtArgs> | null
-    }
-    scalars: $Extensions.GetPayloadResult<{
-      id: string
-      roomId: string
-      candidate: string
-      clientId: string
-      createdAt: Date
-    }, ExtArgs["result"]["iceCandidate"]>
-    composites: {}
-  }
-
-  type IceCandidateGetPayload<S extends boolean | null | undefined | IceCandidateDefaultArgs> = $Result.GetResult<Prisma.$IceCandidatePayload, S>
-
-  type IceCandidateCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<IceCandidateFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: IceCandidateCountAggregateInputType | true
-    }
-
-  export interface IceCandidateDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['IceCandidate'], meta: { name: 'IceCandidate' } }
-    /**
-     * Find zero or one IceCandidate that matches the filter.
-     * @param {IceCandidateFindUniqueArgs} args - Arguments to find a IceCandidate
-     * @example
-     * // Get one IceCandidate
-     * const iceCandidate = await prisma.iceCandidate.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends IceCandidateFindUniqueArgs>(args: SelectSubset<T, IceCandidateFindUniqueArgs<ExtArgs>>): Prisma__IceCandidateClient<$Result.GetResult<Prisma.$IceCandidatePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find one IceCandidate that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {IceCandidateFindUniqueOrThrowArgs} args - Arguments to find a IceCandidate
-     * @example
-     * // Get one IceCandidate
-     * const iceCandidate = await prisma.iceCandidate.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends IceCandidateFindUniqueOrThrowArgs>(args: SelectSubset<T, IceCandidateFindUniqueOrThrowArgs<ExtArgs>>): Prisma__IceCandidateClient<$Result.GetResult<Prisma.$IceCandidatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first IceCandidate that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {IceCandidateFindFirstArgs} args - Arguments to find a IceCandidate
-     * @example
-     * // Get one IceCandidate
-     * const iceCandidate = await prisma.iceCandidate.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends IceCandidateFindFirstArgs>(args?: SelectSubset<T, IceCandidateFindFirstArgs<ExtArgs>>): Prisma__IceCandidateClient<$Result.GetResult<Prisma.$IceCandidatePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first IceCandidate that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {IceCandidateFindFirstOrThrowArgs} args - Arguments to find a IceCandidate
-     * @example
-     * // Get one IceCandidate
-     * const iceCandidate = await prisma.iceCandidate.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends IceCandidateFindFirstOrThrowArgs>(args?: SelectSubset<T, IceCandidateFindFirstOrThrowArgs<ExtArgs>>): Prisma__IceCandidateClient<$Result.GetResult<Prisma.$IceCandidatePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find zero or more IceCandidates that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {IceCandidateFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all IceCandidates
-     * const iceCandidates = await prisma.iceCandidate.findMany()
-     * 
-     * // Get first 10 IceCandidates
-     * const iceCandidates = await prisma.iceCandidate.findMany({ take: 10 })
-     * 
-     * // Only select the `id`
-     * const iceCandidateWithIdOnly = await prisma.iceCandidate.findMany({ select: { id: true } })
-     * 
-     */
-    findMany<T extends IceCandidateFindManyArgs>(args?: SelectSubset<T, IceCandidateFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$IceCandidatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
-
-    /**
-     * Create a IceCandidate.
-     * @param {IceCandidateCreateArgs} args - Arguments to create a IceCandidate.
-     * @example
-     * // Create one IceCandidate
-     * const IceCandidate = await prisma.iceCandidate.create({
-     *   data: {
-     *     // ... data to create a IceCandidate
-     *   }
-     * })
-     * 
-     */
-    create<T extends IceCandidateCreateArgs>(args: SelectSubset<T, IceCandidateCreateArgs<ExtArgs>>): Prisma__IceCandidateClient<$Result.GetResult<Prisma.$IceCandidatePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Create many IceCandidates.
-     * @param {IceCandidateCreateManyArgs} args - Arguments to create many IceCandidates.
-     * @example
-     * // Create many IceCandidates
-     * const iceCandidate = await prisma.iceCandidate.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends IceCandidateCreateManyArgs>(args?: SelectSubset<T, IceCandidateCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many IceCandidates and returns the data saved in the database.
-     * @param {IceCandidateCreateManyAndReturnArgs} args - Arguments to create many IceCandidates.
-     * @example
-     * // Create many IceCandidates
-     * const iceCandidate = await prisma.iceCandidate.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many IceCandidates and only return the `id`
-     * const iceCandidateWithIdOnly = await prisma.iceCandidate.createManyAndReturn({
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends IceCandidateCreateManyAndReturnArgs>(args?: SelectSubset<T, IceCandidateCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$IceCandidatePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Delete a IceCandidate.
-     * @param {IceCandidateDeleteArgs} args - Arguments to delete one IceCandidate.
-     * @example
-     * // Delete one IceCandidate
-     * const IceCandidate = await prisma.iceCandidate.delete({
-     *   where: {
-     *     // ... filter to delete one IceCandidate
-     *   }
-     * })
-     * 
-     */
-    delete<T extends IceCandidateDeleteArgs>(args: SelectSubset<T, IceCandidateDeleteArgs<ExtArgs>>): Prisma__IceCandidateClient<$Result.GetResult<Prisma.$IceCandidatePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Update one IceCandidate.
-     * @param {IceCandidateUpdateArgs} args - Arguments to update one IceCandidate.
-     * @example
-     * // Update one IceCandidate
-     * const iceCandidate = await prisma.iceCandidate.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends IceCandidateUpdateArgs>(args: SelectSubset<T, IceCandidateUpdateArgs<ExtArgs>>): Prisma__IceCandidateClient<$Result.GetResult<Prisma.$IceCandidatePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Delete zero or more IceCandidates.
-     * @param {IceCandidateDeleteManyArgs} args - Arguments to filter IceCandidates to delete.
-     * @example
-     * // Delete a few IceCandidates
-     * const { count } = await prisma.iceCandidate.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends IceCandidateDeleteManyArgs>(args?: SelectSubset<T, IceCandidateDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more IceCandidates.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {IceCandidateUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many IceCandidates
-     * const iceCandidate = await prisma.iceCandidate.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends IceCandidateUpdateManyArgs>(args: SelectSubset<T, IceCandidateUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more IceCandidates and returns the data updated in the database.
-     * @param {IceCandidateUpdateManyAndReturnArgs} args - Arguments to update many IceCandidates.
-     * @example
-     * // Update many IceCandidates
-     * const iceCandidate = await prisma.iceCandidate.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more IceCandidates and only return the `id`
-     * const iceCandidateWithIdOnly = await prisma.iceCandidate.updateManyAndReturn({
-     *   select: { id: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends IceCandidateUpdateManyAndReturnArgs>(args: SelectSubset<T, IceCandidateUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$IceCandidatePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Create or update one IceCandidate.
-     * @param {IceCandidateUpsertArgs} args - Arguments to update or create a IceCandidate.
-     * @example
-     * // Update or create a IceCandidate
-     * const iceCandidate = await prisma.iceCandidate.upsert({
-     *   create: {
-     *     // ... data to create a IceCandidate
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the IceCandidate we want to update
-     *   }
-     * })
-     */
-    upsert<T extends IceCandidateUpsertArgs>(args: SelectSubset<T, IceCandidateUpsertArgs<ExtArgs>>): Prisma__IceCandidateClient<$Result.GetResult<Prisma.$IceCandidatePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-
-    /**
-     * Count the number of IceCandidates.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {IceCandidateCountArgs} args - Arguments to filter IceCandidates to count.
-     * @example
-     * // Count the number of IceCandidates
-     * const count = await prisma.iceCandidate.count({
-     *   where: {
-     *     // ... the filter for the IceCandidates we want to count
-     *   }
-     * })
-    **/
-    count<T extends IceCandidateCountArgs>(
-      args?: Subset<T, IceCandidateCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], IceCandidateCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a IceCandidate.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {IceCandidateAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends IceCandidateAggregateArgs>(args: Subset<T, IceCandidateAggregateArgs>): Prisma.PrismaPromise<GetIceCandidateAggregateType<T>>
-
-    /**
-     * Group by IceCandidate.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {IceCandidateGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends IceCandidateGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: IceCandidateGroupByArgs['orderBy'] }
-        : { orderBy?: IceCandidateGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, IceCandidateGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetIceCandidateGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the IceCandidate model
-   */
-  readonly fields: IceCandidateFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for IceCandidate.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__IceCandidateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    room<T extends RoomDefaultArgs<ExtArgs> = {}>(args?: Subset<T, RoomDefaultArgs<ExtArgs>>): Prisma__RoomClient<$Result.GetResult<Prisma.$RoomPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    participant<T extends IceCandidate$participantArgs<ExtArgs> = {}>(args?: Subset<T, IceCandidate$participantArgs<ExtArgs>>): Prisma__ParticipantClient<$Result.GetResult<Prisma.$ParticipantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the IceCandidate model
-   */
-  interface IceCandidateFieldRefs {
-    readonly id: FieldRef<"IceCandidate", 'String'>
-    readonly roomId: FieldRef<"IceCandidate", 'String'>
-    readonly candidate: FieldRef<"IceCandidate", 'String'>
-    readonly clientId: FieldRef<"IceCandidate", 'String'>
-    readonly createdAt: FieldRef<"IceCandidate", 'DateTime'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * IceCandidate findUnique
-   */
-  export type IceCandidateFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the IceCandidate
-     */
-    select?: IceCandidateSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the IceCandidate
-     */
-    omit?: IceCandidateOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: IceCandidateInclude<ExtArgs> | null
-    /**
-     * Filter, which IceCandidate to fetch.
-     */
-    where: IceCandidateWhereUniqueInput
-  }
-
-  /**
-   * IceCandidate findUniqueOrThrow
-   */
-  export type IceCandidateFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the IceCandidate
-     */
-    select?: IceCandidateSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the IceCandidate
-     */
-    omit?: IceCandidateOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: IceCandidateInclude<ExtArgs> | null
-    /**
-     * Filter, which IceCandidate to fetch.
-     */
-    where: IceCandidateWhereUniqueInput
-  }
-
-  /**
-   * IceCandidate findFirst
-   */
-  export type IceCandidateFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the IceCandidate
-     */
-    select?: IceCandidateSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the IceCandidate
-     */
-    omit?: IceCandidateOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: IceCandidateInclude<ExtArgs> | null
-    /**
-     * Filter, which IceCandidate to fetch.
-     */
-    where?: IceCandidateWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of IceCandidates to fetch.
-     */
-    orderBy?: IceCandidateOrderByWithRelationInput | IceCandidateOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for IceCandidates.
-     */
-    cursor?: IceCandidateWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` IceCandidates from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` IceCandidates.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of IceCandidates.
-     */
-    distinct?: IceCandidateScalarFieldEnum | IceCandidateScalarFieldEnum[]
-  }
-
-  /**
-   * IceCandidate findFirstOrThrow
-   */
-  export type IceCandidateFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the IceCandidate
-     */
-    select?: IceCandidateSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the IceCandidate
-     */
-    omit?: IceCandidateOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: IceCandidateInclude<ExtArgs> | null
-    /**
-     * Filter, which IceCandidate to fetch.
-     */
-    where?: IceCandidateWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of IceCandidates to fetch.
-     */
-    orderBy?: IceCandidateOrderByWithRelationInput | IceCandidateOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for IceCandidates.
-     */
-    cursor?: IceCandidateWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` IceCandidates from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` IceCandidates.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of IceCandidates.
-     */
-    distinct?: IceCandidateScalarFieldEnum | IceCandidateScalarFieldEnum[]
-  }
-
-  /**
-   * IceCandidate findMany
-   */
-  export type IceCandidateFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the IceCandidate
-     */
-    select?: IceCandidateSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the IceCandidate
-     */
-    omit?: IceCandidateOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: IceCandidateInclude<ExtArgs> | null
-    /**
-     * Filter, which IceCandidates to fetch.
-     */
-    where?: IceCandidateWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of IceCandidates to fetch.
-     */
-    orderBy?: IceCandidateOrderByWithRelationInput | IceCandidateOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing IceCandidates.
-     */
-    cursor?: IceCandidateWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` IceCandidates from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` IceCandidates.
-     */
-    skip?: number
-    distinct?: IceCandidateScalarFieldEnum | IceCandidateScalarFieldEnum[]
-  }
-
-  /**
-   * IceCandidate create
-   */
-  export type IceCandidateCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the IceCandidate
-     */
-    select?: IceCandidateSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the IceCandidate
-     */
-    omit?: IceCandidateOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: IceCandidateInclude<ExtArgs> | null
-    /**
-     * The data needed to create a IceCandidate.
-     */
-    data: XOR<IceCandidateCreateInput, IceCandidateUncheckedCreateInput>
-  }
-
-  /**
-   * IceCandidate createMany
-   */
-  export type IceCandidateCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many IceCandidates.
-     */
-    data: IceCandidateCreateManyInput | IceCandidateCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * IceCandidate createManyAndReturn
-   */
-  export type IceCandidateCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the IceCandidate
-     */
-    select?: IceCandidateSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the IceCandidate
-     */
-    omit?: IceCandidateOmit<ExtArgs> | null
-    /**
-     * The data used to create many IceCandidates.
-     */
-    data: IceCandidateCreateManyInput | IceCandidateCreateManyInput[]
-    skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: IceCandidateIncludeCreateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * IceCandidate update
-   */
-  export type IceCandidateUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the IceCandidate
-     */
-    select?: IceCandidateSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the IceCandidate
-     */
-    omit?: IceCandidateOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: IceCandidateInclude<ExtArgs> | null
-    /**
-     * The data needed to update a IceCandidate.
-     */
-    data: XOR<IceCandidateUpdateInput, IceCandidateUncheckedUpdateInput>
-    /**
-     * Choose, which IceCandidate to update.
-     */
-    where: IceCandidateWhereUniqueInput
-  }
-
-  /**
-   * IceCandidate updateMany
-   */
-  export type IceCandidateUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update IceCandidates.
-     */
-    data: XOR<IceCandidateUpdateManyMutationInput, IceCandidateUncheckedUpdateManyInput>
-    /**
-     * Filter which IceCandidates to update
-     */
-    where?: IceCandidateWhereInput
-    /**
-     * Limit how many IceCandidates to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * IceCandidate updateManyAndReturn
-   */
-  export type IceCandidateUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the IceCandidate
-     */
-    select?: IceCandidateSelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the IceCandidate
-     */
-    omit?: IceCandidateOmit<ExtArgs> | null
-    /**
-     * The data used to update IceCandidates.
-     */
-    data: XOR<IceCandidateUpdateManyMutationInput, IceCandidateUncheckedUpdateManyInput>
-    /**
-     * Filter which IceCandidates to update
-     */
-    where?: IceCandidateWhereInput
-    /**
-     * Limit how many IceCandidates to update.
-     */
-    limit?: number
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: IceCandidateIncludeUpdateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * IceCandidate upsert
-   */
-  export type IceCandidateUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the IceCandidate
-     */
-    select?: IceCandidateSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the IceCandidate
-     */
-    omit?: IceCandidateOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: IceCandidateInclude<ExtArgs> | null
-    /**
-     * The filter to search for the IceCandidate to update in case it exists.
-     */
-    where: IceCandidateWhereUniqueInput
-    /**
-     * In case the IceCandidate found by the `where` argument doesn't exist, create a new IceCandidate with this data.
-     */
-    create: XOR<IceCandidateCreateInput, IceCandidateUncheckedCreateInput>
-    /**
-     * In case the IceCandidate was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<IceCandidateUpdateInput, IceCandidateUncheckedUpdateInput>
-  }
-
-  /**
-   * IceCandidate delete
-   */
-  export type IceCandidateDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the IceCandidate
-     */
-    select?: IceCandidateSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the IceCandidate
-     */
-    omit?: IceCandidateOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: IceCandidateInclude<ExtArgs> | null
-    /**
-     * Filter which IceCandidate to delete.
-     */
-    where: IceCandidateWhereUniqueInput
-  }
-
-  /**
-   * IceCandidate deleteMany
-   */
-  export type IceCandidateDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which IceCandidates to delete
-     */
-    where?: IceCandidateWhereInput
-    /**
-     * Limit how many IceCandidates to delete.
-     */
-    limit?: number
-  }
-
-  /**
-   * IceCandidate.participant
-   */
-  export type IceCandidate$participantArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Participant
-     */
-    select?: ParticipantSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Participant
-     */
-    omit?: ParticipantOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: ParticipantInclude<ExtArgs> | null
-    where?: ParticipantWhereInput
-  }
-
-  /**
-   * IceCandidate without action
-   */
-  export type IceCandidateDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the IceCandidate
-     */
-    select?: IceCandidateSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the IceCandidate
-     */
-    omit?: IceCandidateOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: IceCandidateInclude<ExtArgs> | null
   }
 
 
@@ -11962,6 +9565,8 @@ export namespace Prisma {
     title: 'title',
     status: 'status',
     userId: 'userId',
+    scheduleTime: 'scheduleTime',
+    isDeleted: 'isDeleted',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -11979,27 +9584,6 @@ export namespace Prisma {
   };
 
   export type ParticipantScalarFieldEnum = (typeof ParticipantScalarFieldEnum)[keyof typeof ParticipantScalarFieldEnum]
-
-
-  export const OfferScalarFieldEnum: {
-    id: 'id',
-    roomId: 'roomId',
-    sdp: 'sdp',
-    createdAt: 'createdAt'
-  };
-
-  export type OfferScalarFieldEnum = (typeof OfferScalarFieldEnum)[keyof typeof OfferScalarFieldEnum]
-
-
-  export const IceCandidateScalarFieldEnum: {
-    id: 'id',
-    roomId: 'roomId',
-    candidate: 'candidate',
-    clientId: 'clientId',
-    createdAt: 'createdAt'
-  };
-
-  export type IceCandidateScalarFieldEnum = (typeof IceCandidateScalarFieldEnum)[keyof typeof IceCandidateScalarFieldEnum]
 
 
   export const SignalingMessageScalarFieldEnum: {
@@ -12486,13 +10070,13 @@ export namespace Prisma {
     title?: StringFilter<"Room"> | string
     status?: EnumRoomStatusFilter<"Room"> | $Enums.RoomStatus
     userId?: StringFilter<"Room"> | string
+    scheduleTime?: DateTimeNullableFilter<"Room"> | Date | string | null
+    isDeleted?: BoolFilter<"Room"> | boolean
     createdAt?: DateTimeFilter<"Room"> | Date | string
     updatedAt?: DateTimeFilter<"Room"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     participants?: ParticipantListRelationFilter
     messages?: SignalingMessageListRelationFilter
-    offers?: OfferListRelationFilter
-    iceCandidates?: IceCandidateListRelationFilter
   }
 
   export type RoomOrderByWithRelationInput = {
@@ -12500,13 +10084,13 @@ export namespace Prisma {
     title?: SortOrder
     status?: SortOrder
     userId?: SortOrder
+    scheduleTime?: SortOrderInput | SortOrder
+    isDeleted?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
     participants?: ParticipantOrderByRelationAggregateInput
     messages?: SignalingMessageOrderByRelationAggregateInput
-    offers?: OfferOrderByRelationAggregateInput
-    iceCandidates?: IceCandidateOrderByRelationAggregateInput
   }
 
   export type RoomWhereUniqueInput = Prisma.AtLeast<{
@@ -12517,13 +10101,13 @@ export namespace Prisma {
     title?: StringFilter<"Room"> | string
     status?: EnumRoomStatusFilter<"Room"> | $Enums.RoomStatus
     userId?: StringFilter<"Room"> | string
+    scheduleTime?: DateTimeNullableFilter<"Room"> | Date | string | null
+    isDeleted?: BoolFilter<"Room"> | boolean
     createdAt?: DateTimeFilter<"Room"> | Date | string
     updatedAt?: DateTimeFilter<"Room"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     participants?: ParticipantListRelationFilter
     messages?: SignalingMessageListRelationFilter
-    offers?: OfferListRelationFilter
-    iceCandidates?: IceCandidateListRelationFilter
   }, "id">
 
   export type RoomOrderByWithAggregationInput = {
@@ -12531,6 +10115,8 @@ export namespace Prisma {
     title?: SortOrder
     status?: SortOrder
     userId?: SortOrder
+    scheduleTime?: SortOrderInput | SortOrder
+    isDeleted?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: RoomCountOrderByAggregateInput
@@ -12546,6 +10132,8 @@ export namespace Prisma {
     title?: StringWithAggregatesFilter<"Room"> | string
     status?: EnumRoomStatusWithAggregatesFilter<"Room"> | $Enums.RoomStatus
     userId?: StringWithAggregatesFilter<"Room"> | string
+    scheduleTime?: DateTimeNullableWithAggregatesFilter<"Room"> | Date | string | null
+    isDeleted?: BoolWithAggregatesFilter<"Room"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Room"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Room"> | Date | string
   }
@@ -12564,7 +10152,6 @@ export namespace Prisma {
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     sentMessages?: SignalingMessageListRelationFilter
     receivedMessages?: SignalingMessageListRelationFilter
-    iceCandidates?: IceCandidateListRelationFilter
   }
 
   export type ParticipantOrderByWithRelationInput = {
@@ -12578,7 +10165,6 @@ export namespace Prisma {
     user?: UserOrderByWithRelationInput
     sentMessages?: SignalingMessageOrderByRelationAggregateInput
     receivedMessages?: SignalingMessageOrderByRelationAggregateInput
-    iceCandidates?: IceCandidateOrderByRelationAggregateInput
   }
 
   export type ParticipantWhereUniqueInput = Prisma.AtLeast<{
@@ -12596,7 +10182,6 @@ export namespace Prisma {
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     sentMessages?: SignalingMessageListRelationFilter
     receivedMessages?: SignalingMessageListRelationFilter
-    iceCandidates?: IceCandidateListRelationFilter
   }, "id" | "userId_roomId">
 
   export type ParticipantOrderByWithAggregationInput = {
@@ -12621,114 +10206,6 @@ export namespace Prisma {
     role?: EnumRoleWithAggregatesFilter<"Participant"> | $Enums.Role
     joinedAt?: DateTimeWithAggregatesFilter<"Participant"> | Date | string
     leftAt?: DateTimeNullableWithAggregatesFilter<"Participant"> | Date | string | null
-  }
-
-  export type OfferWhereInput = {
-    AND?: OfferWhereInput | OfferWhereInput[]
-    OR?: OfferWhereInput[]
-    NOT?: OfferWhereInput | OfferWhereInput[]
-    id?: StringFilter<"Offer"> | string
-    roomId?: StringFilter<"Offer"> | string
-    sdp?: StringFilter<"Offer"> | string
-    createdAt?: DateTimeFilter<"Offer"> | Date | string
-    room?: XOR<RoomScalarRelationFilter, RoomWhereInput>
-  }
-
-  export type OfferOrderByWithRelationInput = {
-    id?: SortOrder
-    roomId?: SortOrder
-    sdp?: SortOrder
-    createdAt?: SortOrder
-    room?: RoomOrderByWithRelationInput
-  }
-
-  export type OfferWhereUniqueInput = Prisma.AtLeast<{
-    id?: string
-    AND?: OfferWhereInput | OfferWhereInput[]
-    OR?: OfferWhereInput[]
-    NOT?: OfferWhereInput | OfferWhereInput[]
-    roomId?: StringFilter<"Offer"> | string
-    sdp?: StringFilter<"Offer"> | string
-    createdAt?: DateTimeFilter<"Offer"> | Date | string
-    room?: XOR<RoomScalarRelationFilter, RoomWhereInput>
-  }, "id">
-
-  export type OfferOrderByWithAggregationInput = {
-    id?: SortOrder
-    roomId?: SortOrder
-    sdp?: SortOrder
-    createdAt?: SortOrder
-    _count?: OfferCountOrderByAggregateInput
-    _max?: OfferMaxOrderByAggregateInput
-    _min?: OfferMinOrderByAggregateInput
-  }
-
-  export type OfferScalarWhereWithAggregatesInput = {
-    AND?: OfferScalarWhereWithAggregatesInput | OfferScalarWhereWithAggregatesInput[]
-    OR?: OfferScalarWhereWithAggregatesInput[]
-    NOT?: OfferScalarWhereWithAggregatesInput | OfferScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"Offer"> | string
-    roomId?: StringWithAggregatesFilter<"Offer"> | string
-    sdp?: StringWithAggregatesFilter<"Offer"> | string
-    createdAt?: DateTimeWithAggregatesFilter<"Offer"> | Date | string
-  }
-
-  export type IceCandidateWhereInput = {
-    AND?: IceCandidateWhereInput | IceCandidateWhereInput[]
-    OR?: IceCandidateWhereInput[]
-    NOT?: IceCandidateWhereInput | IceCandidateWhereInput[]
-    id?: StringFilter<"IceCandidate"> | string
-    roomId?: StringFilter<"IceCandidate"> | string
-    candidate?: StringFilter<"IceCandidate"> | string
-    clientId?: StringFilter<"IceCandidate"> | string
-    createdAt?: DateTimeFilter<"IceCandidate"> | Date | string
-    room?: XOR<RoomScalarRelationFilter, RoomWhereInput>
-    participant?: XOR<ParticipantNullableScalarRelationFilter, ParticipantWhereInput> | null
-  }
-
-  export type IceCandidateOrderByWithRelationInput = {
-    id?: SortOrder
-    roomId?: SortOrder
-    candidate?: SortOrder
-    clientId?: SortOrder
-    createdAt?: SortOrder
-    room?: RoomOrderByWithRelationInput
-    participant?: ParticipantOrderByWithRelationInput
-  }
-
-  export type IceCandidateWhereUniqueInput = Prisma.AtLeast<{
-    id?: string
-    AND?: IceCandidateWhereInput | IceCandidateWhereInput[]
-    OR?: IceCandidateWhereInput[]
-    NOT?: IceCandidateWhereInput | IceCandidateWhereInput[]
-    roomId?: StringFilter<"IceCandidate"> | string
-    candidate?: StringFilter<"IceCandidate"> | string
-    clientId?: StringFilter<"IceCandidate"> | string
-    createdAt?: DateTimeFilter<"IceCandidate"> | Date | string
-    room?: XOR<RoomScalarRelationFilter, RoomWhereInput>
-    participant?: XOR<ParticipantNullableScalarRelationFilter, ParticipantWhereInput> | null
-  }, "id">
-
-  export type IceCandidateOrderByWithAggregationInput = {
-    id?: SortOrder
-    roomId?: SortOrder
-    candidate?: SortOrder
-    clientId?: SortOrder
-    createdAt?: SortOrder
-    _count?: IceCandidateCountOrderByAggregateInput
-    _max?: IceCandidateMaxOrderByAggregateInput
-    _min?: IceCandidateMinOrderByAggregateInput
-  }
-
-  export type IceCandidateScalarWhereWithAggregatesInput = {
-    AND?: IceCandidateScalarWhereWithAggregatesInput | IceCandidateScalarWhereWithAggregatesInput[]
-    OR?: IceCandidateScalarWhereWithAggregatesInput[]
-    NOT?: IceCandidateScalarWhereWithAggregatesInput | IceCandidateScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"IceCandidate"> | string
-    roomId?: StringWithAggregatesFilter<"IceCandidate"> | string
-    candidate?: StringWithAggregatesFilter<"IceCandidate"> | string
-    clientId?: StringWithAggregatesFilter<"IceCandidate"> | string
-    createdAt?: DateTimeWithAggregatesFilter<"IceCandidate"> | Date | string
   }
 
   export type SignalingMessageWhereInput = {
@@ -13140,13 +10617,13 @@ export namespace Prisma {
     id?: string
     title: string
     status?: $Enums.RoomStatus
+    scheduleTime?: Date | string | null
+    isDeleted?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutRoomsInput
     participants?: ParticipantCreateNestedManyWithoutRoomInput
     messages?: SignalingMessageCreateNestedManyWithoutRoomInput
-    offers?: OfferCreateNestedManyWithoutRoomInput
-    iceCandidates?: IceCandidateCreateNestedManyWithoutRoomInput
   }
 
   export type RoomUncheckedCreateInput = {
@@ -13154,25 +10631,25 @@ export namespace Prisma {
     title: string
     status?: $Enums.RoomStatus
     userId: string
+    scheduleTime?: Date | string | null
+    isDeleted?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     participants?: ParticipantUncheckedCreateNestedManyWithoutRoomInput
     messages?: SignalingMessageUncheckedCreateNestedManyWithoutRoomInput
-    offers?: OfferUncheckedCreateNestedManyWithoutRoomInput
-    iceCandidates?: IceCandidateUncheckedCreateNestedManyWithoutRoomInput
   }
 
   export type RoomUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     status?: EnumRoomStatusFieldUpdateOperationsInput | $Enums.RoomStatus
+    scheduleTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutRoomsNestedInput
     participants?: ParticipantUpdateManyWithoutRoomNestedInput
     messages?: SignalingMessageUpdateManyWithoutRoomNestedInput
-    offers?: OfferUpdateManyWithoutRoomNestedInput
-    iceCandidates?: IceCandidateUpdateManyWithoutRoomNestedInput
   }
 
   export type RoomUncheckedUpdateInput = {
@@ -13180,12 +10657,12 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     status?: EnumRoomStatusFieldUpdateOperationsInput | $Enums.RoomStatus
     userId?: StringFieldUpdateOperationsInput | string
+    scheduleTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     participants?: ParticipantUncheckedUpdateManyWithoutRoomNestedInput
     messages?: SignalingMessageUncheckedUpdateManyWithoutRoomNestedInput
-    offers?: OfferUncheckedUpdateManyWithoutRoomNestedInput
-    iceCandidates?: IceCandidateUncheckedUpdateManyWithoutRoomNestedInput
   }
 
   export type RoomCreateManyInput = {
@@ -13193,6 +10670,8 @@ export namespace Prisma {
     title: string
     status?: $Enums.RoomStatus
     userId: string
+    scheduleTime?: Date | string | null
+    isDeleted?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -13201,6 +10680,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     status?: EnumRoomStatusFieldUpdateOperationsInput | $Enums.RoomStatus
+    scheduleTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -13210,6 +10691,8 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     status?: EnumRoomStatusFieldUpdateOperationsInput | $Enums.RoomStatus
     userId?: StringFieldUpdateOperationsInput | string
+    scheduleTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -13223,7 +10706,6 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutParticipantsInput
     sentMessages?: SignalingMessageCreateNestedManyWithoutFromInput
     receivedMessages?: SignalingMessageCreateNestedManyWithoutToInput
-    iceCandidates?: IceCandidateCreateNestedManyWithoutParticipantInput
   }
 
   export type ParticipantUncheckedCreateInput = {
@@ -13235,7 +10717,6 @@ export namespace Prisma {
     leftAt?: Date | string | null
     sentMessages?: SignalingMessageUncheckedCreateNestedManyWithoutFromInput
     receivedMessages?: SignalingMessageUncheckedCreateNestedManyWithoutToInput
-    iceCandidates?: IceCandidateUncheckedCreateNestedManyWithoutParticipantInput
   }
 
   export type ParticipantUpdateInput = {
@@ -13247,7 +10728,6 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutParticipantsNestedInput
     sentMessages?: SignalingMessageUpdateManyWithoutFromNestedInput
     receivedMessages?: SignalingMessageUpdateManyWithoutToNestedInput
-    iceCandidates?: IceCandidateUpdateManyWithoutParticipantNestedInput
   }
 
   export type ParticipantUncheckedUpdateInput = {
@@ -13259,7 +10739,6 @@ export namespace Prisma {
     leftAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     sentMessages?: SignalingMessageUncheckedUpdateManyWithoutFromNestedInput
     receivedMessages?: SignalingMessageUncheckedUpdateManyWithoutToNestedInput
-    iceCandidates?: IceCandidateUncheckedUpdateManyWithoutParticipantNestedInput
   }
 
   export type ParticipantCreateManyInput = {
@@ -13285,108 +10764,6 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  }
-
-  export type OfferCreateInput = {
-    id?: string
-    sdp: string
-    createdAt?: Date | string
-    room: RoomCreateNestedOneWithoutOffersInput
-  }
-
-  export type OfferUncheckedCreateInput = {
-    id?: string
-    roomId: string
-    sdp: string
-    createdAt?: Date | string
-  }
-
-  export type OfferUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    sdp?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    room?: RoomUpdateOneRequiredWithoutOffersNestedInput
-  }
-
-  export type OfferUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    roomId?: StringFieldUpdateOperationsInput | string
-    sdp?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type OfferCreateManyInput = {
-    id?: string
-    roomId: string
-    sdp: string
-    createdAt?: Date | string
-  }
-
-  export type OfferUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    sdp?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type OfferUncheckedUpdateManyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    roomId?: StringFieldUpdateOperationsInput | string
-    sdp?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type IceCandidateCreateInput = {
-    id?: string
-    candidate: string
-    createdAt?: Date | string
-    room: RoomCreateNestedOneWithoutIceCandidatesInput
-    participant?: ParticipantCreateNestedOneWithoutIceCandidatesInput
-  }
-
-  export type IceCandidateUncheckedCreateInput = {
-    id?: string
-    roomId: string
-    candidate: string
-    clientId: string
-    createdAt?: Date | string
-  }
-
-  export type IceCandidateUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    candidate?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    room?: RoomUpdateOneRequiredWithoutIceCandidatesNestedInput
-    participant?: ParticipantUpdateOneWithoutIceCandidatesNestedInput
-  }
-
-  export type IceCandidateUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    roomId?: StringFieldUpdateOperationsInput | string
-    candidate?: StringFieldUpdateOperationsInput | string
-    clientId?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type IceCandidateCreateManyInput = {
-    id?: string
-    roomId: string
-    candidate: string
-    clientId: string
-    createdAt?: Date | string
-  }
-
-  export type IceCandidateUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    candidate?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type IceCandidateUncheckedUpdateManyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    roomId?: StringFieldUpdateOperationsInput | string
-    candidate?: StringFieldUpdateOperationsInput | string
-    clientId?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SignalingMessageCreateInput = {
@@ -13835,27 +11212,7 @@ export namespace Prisma {
     none?: SignalingMessageWhereInput
   }
 
-  export type OfferListRelationFilter = {
-    every?: OfferWhereInput
-    some?: OfferWhereInput
-    none?: OfferWhereInput
-  }
-
-  export type IceCandidateListRelationFilter = {
-    every?: IceCandidateWhereInput
-    some?: IceCandidateWhereInput
-    none?: IceCandidateWhereInput
-  }
-
   export type SignalingMessageOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type OfferOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type IceCandidateOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -13864,6 +11221,8 @@ export namespace Prisma {
     title?: SortOrder
     status?: SortOrder
     userId?: SortOrder
+    scheduleTime?: SortOrder
+    isDeleted?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -13873,6 +11232,8 @@ export namespace Prisma {
     title?: SortOrder
     status?: SortOrder
     userId?: SortOrder
+    scheduleTime?: SortOrder
+    isDeleted?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -13882,6 +11243,8 @@ export namespace Prisma {
     title?: SortOrder
     status?: SortOrder
     userId?: SortOrder
+    scheduleTime?: SortOrder
+    isDeleted?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -13950,56 +11313,6 @@ export namespace Prisma {
     _max?: NestedEnumRoleFilter<$PrismaModel>
   }
 
-  export type OfferCountOrderByAggregateInput = {
-    id?: SortOrder
-    roomId?: SortOrder
-    sdp?: SortOrder
-    createdAt?: SortOrder
-  }
-
-  export type OfferMaxOrderByAggregateInput = {
-    id?: SortOrder
-    roomId?: SortOrder
-    sdp?: SortOrder
-    createdAt?: SortOrder
-  }
-
-  export type OfferMinOrderByAggregateInput = {
-    id?: SortOrder
-    roomId?: SortOrder
-    sdp?: SortOrder
-    createdAt?: SortOrder
-  }
-
-  export type ParticipantNullableScalarRelationFilter = {
-    is?: ParticipantWhereInput | null
-    isNot?: ParticipantWhereInput | null
-  }
-
-  export type IceCandidateCountOrderByAggregateInput = {
-    id?: SortOrder
-    roomId?: SortOrder
-    candidate?: SortOrder
-    clientId?: SortOrder
-    createdAt?: SortOrder
-  }
-
-  export type IceCandidateMaxOrderByAggregateInput = {
-    id?: SortOrder
-    roomId?: SortOrder
-    candidate?: SortOrder
-    clientId?: SortOrder
-    createdAt?: SortOrder
-  }
-
-  export type IceCandidateMinOrderByAggregateInput = {
-    id?: SortOrder
-    roomId?: SortOrder
-    candidate?: SortOrder
-    clientId?: SortOrder
-    createdAt?: SortOrder
-  }
-
   export type EnumMessageTypeFilter<$PrismaModel = never> = {
     equals?: $Enums.MessageType | EnumMessageTypeFieldRefInput<$PrismaModel>
     in?: $Enums.MessageType[] | ListEnumMessageTypeFieldRefInput<$PrismaModel>
@@ -14033,6 +11346,11 @@ export namespace Prisma {
   export type ParticipantScalarRelationFilter = {
     is?: ParticipantWhereInput
     isNot?: ParticipantWhereInput
+  }
+
+  export type ParticipantNullableScalarRelationFilter = {
+    is?: ParticipantWhereInput | null
+    isNot?: ParticipantWhereInput | null
   }
 
   export type SignalingMessageCountOrderByAggregateInput = {
@@ -14346,20 +11664,6 @@ export namespace Prisma {
     connect?: SignalingMessageWhereUniqueInput | SignalingMessageWhereUniqueInput[]
   }
 
-  export type OfferCreateNestedManyWithoutRoomInput = {
-    create?: XOR<OfferCreateWithoutRoomInput, OfferUncheckedCreateWithoutRoomInput> | OfferCreateWithoutRoomInput[] | OfferUncheckedCreateWithoutRoomInput[]
-    connectOrCreate?: OfferCreateOrConnectWithoutRoomInput | OfferCreateOrConnectWithoutRoomInput[]
-    createMany?: OfferCreateManyRoomInputEnvelope
-    connect?: OfferWhereUniqueInput | OfferWhereUniqueInput[]
-  }
-
-  export type IceCandidateCreateNestedManyWithoutRoomInput = {
-    create?: XOR<IceCandidateCreateWithoutRoomInput, IceCandidateUncheckedCreateWithoutRoomInput> | IceCandidateCreateWithoutRoomInput[] | IceCandidateUncheckedCreateWithoutRoomInput[]
-    connectOrCreate?: IceCandidateCreateOrConnectWithoutRoomInput | IceCandidateCreateOrConnectWithoutRoomInput[]
-    createMany?: IceCandidateCreateManyRoomInputEnvelope
-    connect?: IceCandidateWhereUniqueInput | IceCandidateWhereUniqueInput[]
-  }
-
   export type ParticipantUncheckedCreateNestedManyWithoutRoomInput = {
     create?: XOR<ParticipantCreateWithoutRoomInput, ParticipantUncheckedCreateWithoutRoomInput> | ParticipantCreateWithoutRoomInput[] | ParticipantUncheckedCreateWithoutRoomInput[]
     connectOrCreate?: ParticipantCreateOrConnectWithoutRoomInput | ParticipantCreateOrConnectWithoutRoomInput[]
@@ -14372,20 +11676,6 @@ export namespace Prisma {
     connectOrCreate?: SignalingMessageCreateOrConnectWithoutRoomInput | SignalingMessageCreateOrConnectWithoutRoomInput[]
     createMany?: SignalingMessageCreateManyRoomInputEnvelope
     connect?: SignalingMessageWhereUniqueInput | SignalingMessageWhereUniqueInput[]
-  }
-
-  export type OfferUncheckedCreateNestedManyWithoutRoomInput = {
-    create?: XOR<OfferCreateWithoutRoomInput, OfferUncheckedCreateWithoutRoomInput> | OfferCreateWithoutRoomInput[] | OfferUncheckedCreateWithoutRoomInput[]
-    connectOrCreate?: OfferCreateOrConnectWithoutRoomInput | OfferCreateOrConnectWithoutRoomInput[]
-    createMany?: OfferCreateManyRoomInputEnvelope
-    connect?: OfferWhereUniqueInput | OfferWhereUniqueInput[]
-  }
-
-  export type IceCandidateUncheckedCreateNestedManyWithoutRoomInput = {
-    create?: XOR<IceCandidateCreateWithoutRoomInput, IceCandidateUncheckedCreateWithoutRoomInput> | IceCandidateCreateWithoutRoomInput[] | IceCandidateUncheckedCreateWithoutRoomInput[]
-    connectOrCreate?: IceCandidateCreateOrConnectWithoutRoomInput | IceCandidateCreateOrConnectWithoutRoomInput[]
-    createMany?: IceCandidateCreateManyRoomInputEnvelope
-    connect?: IceCandidateWhereUniqueInput | IceCandidateWhereUniqueInput[]
   }
 
   export type EnumRoomStatusFieldUpdateOperationsInput = {
@@ -14428,34 +11718,6 @@ export namespace Prisma {
     deleteMany?: SignalingMessageScalarWhereInput | SignalingMessageScalarWhereInput[]
   }
 
-  export type OfferUpdateManyWithoutRoomNestedInput = {
-    create?: XOR<OfferCreateWithoutRoomInput, OfferUncheckedCreateWithoutRoomInput> | OfferCreateWithoutRoomInput[] | OfferUncheckedCreateWithoutRoomInput[]
-    connectOrCreate?: OfferCreateOrConnectWithoutRoomInput | OfferCreateOrConnectWithoutRoomInput[]
-    upsert?: OfferUpsertWithWhereUniqueWithoutRoomInput | OfferUpsertWithWhereUniqueWithoutRoomInput[]
-    createMany?: OfferCreateManyRoomInputEnvelope
-    set?: OfferWhereUniqueInput | OfferWhereUniqueInput[]
-    disconnect?: OfferWhereUniqueInput | OfferWhereUniqueInput[]
-    delete?: OfferWhereUniqueInput | OfferWhereUniqueInput[]
-    connect?: OfferWhereUniqueInput | OfferWhereUniqueInput[]
-    update?: OfferUpdateWithWhereUniqueWithoutRoomInput | OfferUpdateWithWhereUniqueWithoutRoomInput[]
-    updateMany?: OfferUpdateManyWithWhereWithoutRoomInput | OfferUpdateManyWithWhereWithoutRoomInput[]
-    deleteMany?: OfferScalarWhereInput | OfferScalarWhereInput[]
-  }
-
-  export type IceCandidateUpdateManyWithoutRoomNestedInput = {
-    create?: XOR<IceCandidateCreateWithoutRoomInput, IceCandidateUncheckedCreateWithoutRoomInput> | IceCandidateCreateWithoutRoomInput[] | IceCandidateUncheckedCreateWithoutRoomInput[]
-    connectOrCreate?: IceCandidateCreateOrConnectWithoutRoomInput | IceCandidateCreateOrConnectWithoutRoomInput[]
-    upsert?: IceCandidateUpsertWithWhereUniqueWithoutRoomInput | IceCandidateUpsertWithWhereUniqueWithoutRoomInput[]
-    createMany?: IceCandidateCreateManyRoomInputEnvelope
-    set?: IceCandidateWhereUniqueInput | IceCandidateWhereUniqueInput[]
-    disconnect?: IceCandidateWhereUniqueInput | IceCandidateWhereUniqueInput[]
-    delete?: IceCandidateWhereUniqueInput | IceCandidateWhereUniqueInput[]
-    connect?: IceCandidateWhereUniqueInput | IceCandidateWhereUniqueInput[]
-    update?: IceCandidateUpdateWithWhereUniqueWithoutRoomInput | IceCandidateUpdateWithWhereUniqueWithoutRoomInput[]
-    updateMany?: IceCandidateUpdateManyWithWhereWithoutRoomInput | IceCandidateUpdateManyWithWhereWithoutRoomInput[]
-    deleteMany?: IceCandidateScalarWhereInput | IceCandidateScalarWhereInput[]
-  }
-
   export type ParticipantUncheckedUpdateManyWithoutRoomNestedInput = {
     create?: XOR<ParticipantCreateWithoutRoomInput, ParticipantUncheckedCreateWithoutRoomInput> | ParticipantCreateWithoutRoomInput[] | ParticipantUncheckedCreateWithoutRoomInput[]
     connectOrCreate?: ParticipantCreateOrConnectWithoutRoomInput | ParticipantCreateOrConnectWithoutRoomInput[]
@@ -14484,34 +11746,6 @@ export namespace Prisma {
     deleteMany?: SignalingMessageScalarWhereInput | SignalingMessageScalarWhereInput[]
   }
 
-  export type OfferUncheckedUpdateManyWithoutRoomNestedInput = {
-    create?: XOR<OfferCreateWithoutRoomInput, OfferUncheckedCreateWithoutRoomInput> | OfferCreateWithoutRoomInput[] | OfferUncheckedCreateWithoutRoomInput[]
-    connectOrCreate?: OfferCreateOrConnectWithoutRoomInput | OfferCreateOrConnectWithoutRoomInput[]
-    upsert?: OfferUpsertWithWhereUniqueWithoutRoomInput | OfferUpsertWithWhereUniqueWithoutRoomInput[]
-    createMany?: OfferCreateManyRoomInputEnvelope
-    set?: OfferWhereUniqueInput | OfferWhereUniqueInput[]
-    disconnect?: OfferWhereUniqueInput | OfferWhereUniqueInput[]
-    delete?: OfferWhereUniqueInput | OfferWhereUniqueInput[]
-    connect?: OfferWhereUniqueInput | OfferWhereUniqueInput[]
-    update?: OfferUpdateWithWhereUniqueWithoutRoomInput | OfferUpdateWithWhereUniqueWithoutRoomInput[]
-    updateMany?: OfferUpdateManyWithWhereWithoutRoomInput | OfferUpdateManyWithWhereWithoutRoomInput[]
-    deleteMany?: OfferScalarWhereInput | OfferScalarWhereInput[]
-  }
-
-  export type IceCandidateUncheckedUpdateManyWithoutRoomNestedInput = {
-    create?: XOR<IceCandidateCreateWithoutRoomInput, IceCandidateUncheckedCreateWithoutRoomInput> | IceCandidateCreateWithoutRoomInput[] | IceCandidateUncheckedCreateWithoutRoomInput[]
-    connectOrCreate?: IceCandidateCreateOrConnectWithoutRoomInput | IceCandidateCreateOrConnectWithoutRoomInput[]
-    upsert?: IceCandidateUpsertWithWhereUniqueWithoutRoomInput | IceCandidateUpsertWithWhereUniqueWithoutRoomInput[]
-    createMany?: IceCandidateCreateManyRoomInputEnvelope
-    set?: IceCandidateWhereUniqueInput | IceCandidateWhereUniqueInput[]
-    disconnect?: IceCandidateWhereUniqueInput | IceCandidateWhereUniqueInput[]
-    delete?: IceCandidateWhereUniqueInput | IceCandidateWhereUniqueInput[]
-    connect?: IceCandidateWhereUniqueInput | IceCandidateWhereUniqueInput[]
-    update?: IceCandidateUpdateWithWhereUniqueWithoutRoomInput | IceCandidateUpdateWithWhereUniqueWithoutRoomInput[]
-    updateMany?: IceCandidateUpdateManyWithWhereWithoutRoomInput | IceCandidateUpdateManyWithWhereWithoutRoomInput[]
-    deleteMany?: IceCandidateScalarWhereInput | IceCandidateScalarWhereInput[]
-  }
-
   export type RoomCreateNestedOneWithoutParticipantsInput = {
     create?: XOR<RoomCreateWithoutParticipantsInput, RoomUncheckedCreateWithoutParticipantsInput>
     connectOrCreate?: RoomCreateOrConnectWithoutParticipantsInput
@@ -14538,13 +11772,6 @@ export namespace Prisma {
     connect?: SignalingMessageWhereUniqueInput | SignalingMessageWhereUniqueInput[]
   }
 
-  export type IceCandidateCreateNestedManyWithoutParticipantInput = {
-    create?: XOR<IceCandidateCreateWithoutParticipantInput, IceCandidateUncheckedCreateWithoutParticipantInput> | IceCandidateCreateWithoutParticipantInput[] | IceCandidateUncheckedCreateWithoutParticipantInput[]
-    connectOrCreate?: IceCandidateCreateOrConnectWithoutParticipantInput | IceCandidateCreateOrConnectWithoutParticipantInput[]
-    createMany?: IceCandidateCreateManyParticipantInputEnvelope
-    connect?: IceCandidateWhereUniqueInput | IceCandidateWhereUniqueInput[]
-  }
-
   export type SignalingMessageUncheckedCreateNestedManyWithoutFromInput = {
     create?: XOR<SignalingMessageCreateWithoutFromInput, SignalingMessageUncheckedCreateWithoutFromInput> | SignalingMessageCreateWithoutFromInput[] | SignalingMessageUncheckedCreateWithoutFromInput[]
     connectOrCreate?: SignalingMessageCreateOrConnectWithoutFromInput | SignalingMessageCreateOrConnectWithoutFromInput[]
@@ -14557,13 +11784,6 @@ export namespace Prisma {
     connectOrCreate?: SignalingMessageCreateOrConnectWithoutToInput | SignalingMessageCreateOrConnectWithoutToInput[]
     createMany?: SignalingMessageCreateManyToInputEnvelope
     connect?: SignalingMessageWhereUniqueInput | SignalingMessageWhereUniqueInput[]
-  }
-
-  export type IceCandidateUncheckedCreateNestedManyWithoutParticipantInput = {
-    create?: XOR<IceCandidateCreateWithoutParticipantInput, IceCandidateUncheckedCreateWithoutParticipantInput> | IceCandidateCreateWithoutParticipantInput[] | IceCandidateUncheckedCreateWithoutParticipantInput[]
-    connectOrCreate?: IceCandidateCreateOrConnectWithoutParticipantInput | IceCandidateCreateOrConnectWithoutParticipantInput[]
-    createMany?: IceCandidateCreateManyParticipantInputEnvelope
-    connect?: IceCandidateWhereUniqueInput | IceCandidateWhereUniqueInput[]
   }
 
   export type EnumRoleFieldUpdateOperationsInput = {
@@ -14614,20 +11834,6 @@ export namespace Prisma {
     deleteMany?: SignalingMessageScalarWhereInput | SignalingMessageScalarWhereInput[]
   }
 
-  export type IceCandidateUpdateManyWithoutParticipantNestedInput = {
-    create?: XOR<IceCandidateCreateWithoutParticipantInput, IceCandidateUncheckedCreateWithoutParticipantInput> | IceCandidateCreateWithoutParticipantInput[] | IceCandidateUncheckedCreateWithoutParticipantInput[]
-    connectOrCreate?: IceCandidateCreateOrConnectWithoutParticipantInput | IceCandidateCreateOrConnectWithoutParticipantInput[]
-    upsert?: IceCandidateUpsertWithWhereUniqueWithoutParticipantInput | IceCandidateUpsertWithWhereUniqueWithoutParticipantInput[]
-    createMany?: IceCandidateCreateManyParticipantInputEnvelope
-    set?: IceCandidateWhereUniqueInput | IceCandidateWhereUniqueInput[]
-    disconnect?: IceCandidateWhereUniqueInput | IceCandidateWhereUniqueInput[]
-    delete?: IceCandidateWhereUniqueInput | IceCandidateWhereUniqueInput[]
-    connect?: IceCandidateWhereUniqueInput | IceCandidateWhereUniqueInput[]
-    update?: IceCandidateUpdateWithWhereUniqueWithoutParticipantInput | IceCandidateUpdateWithWhereUniqueWithoutParticipantInput[]
-    updateMany?: IceCandidateUpdateManyWithWhereWithoutParticipantInput | IceCandidateUpdateManyWithWhereWithoutParticipantInput[]
-    deleteMany?: IceCandidateScalarWhereInput | IceCandidateScalarWhereInput[]
-  }
-
   export type SignalingMessageUncheckedUpdateManyWithoutFromNestedInput = {
     create?: XOR<SignalingMessageCreateWithoutFromInput, SignalingMessageUncheckedCreateWithoutFromInput> | SignalingMessageCreateWithoutFromInput[] | SignalingMessageUncheckedCreateWithoutFromInput[]
     connectOrCreate?: SignalingMessageCreateOrConnectWithoutFromInput | SignalingMessageCreateOrConnectWithoutFromInput[]
@@ -14654,64 +11860,6 @@ export namespace Prisma {
     update?: SignalingMessageUpdateWithWhereUniqueWithoutToInput | SignalingMessageUpdateWithWhereUniqueWithoutToInput[]
     updateMany?: SignalingMessageUpdateManyWithWhereWithoutToInput | SignalingMessageUpdateManyWithWhereWithoutToInput[]
     deleteMany?: SignalingMessageScalarWhereInput | SignalingMessageScalarWhereInput[]
-  }
-
-  export type IceCandidateUncheckedUpdateManyWithoutParticipantNestedInput = {
-    create?: XOR<IceCandidateCreateWithoutParticipantInput, IceCandidateUncheckedCreateWithoutParticipantInput> | IceCandidateCreateWithoutParticipantInput[] | IceCandidateUncheckedCreateWithoutParticipantInput[]
-    connectOrCreate?: IceCandidateCreateOrConnectWithoutParticipantInput | IceCandidateCreateOrConnectWithoutParticipantInput[]
-    upsert?: IceCandidateUpsertWithWhereUniqueWithoutParticipantInput | IceCandidateUpsertWithWhereUniqueWithoutParticipantInput[]
-    createMany?: IceCandidateCreateManyParticipantInputEnvelope
-    set?: IceCandidateWhereUniqueInput | IceCandidateWhereUniqueInput[]
-    disconnect?: IceCandidateWhereUniqueInput | IceCandidateWhereUniqueInput[]
-    delete?: IceCandidateWhereUniqueInput | IceCandidateWhereUniqueInput[]
-    connect?: IceCandidateWhereUniqueInput | IceCandidateWhereUniqueInput[]
-    update?: IceCandidateUpdateWithWhereUniqueWithoutParticipantInput | IceCandidateUpdateWithWhereUniqueWithoutParticipantInput[]
-    updateMany?: IceCandidateUpdateManyWithWhereWithoutParticipantInput | IceCandidateUpdateManyWithWhereWithoutParticipantInput[]
-    deleteMany?: IceCandidateScalarWhereInput | IceCandidateScalarWhereInput[]
-  }
-
-  export type RoomCreateNestedOneWithoutOffersInput = {
-    create?: XOR<RoomCreateWithoutOffersInput, RoomUncheckedCreateWithoutOffersInput>
-    connectOrCreate?: RoomCreateOrConnectWithoutOffersInput
-    connect?: RoomWhereUniqueInput
-  }
-
-  export type RoomUpdateOneRequiredWithoutOffersNestedInput = {
-    create?: XOR<RoomCreateWithoutOffersInput, RoomUncheckedCreateWithoutOffersInput>
-    connectOrCreate?: RoomCreateOrConnectWithoutOffersInput
-    upsert?: RoomUpsertWithoutOffersInput
-    connect?: RoomWhereUniqueInput
-    update?: XOR<XOR<RoomUpdateToOneWithWhereWithoutOffersInput, RoomUpdateWithoutOffersInput>, RoomUncheckedUpdateWithoutOffersInput>
-  }
-
-  export type RoomCreateNestedOneWithoutIceCandidatesInput = {
-    create?: XOR<RoomCreateWithoutIceCandidatesInput, RoomUncheckedCreateWithoutIceCandidatesInput>
-    connectOrCreate?: RoomCreateOrConnectWithoutIceCandidatesInput
-    connect?: RoomWhereUniqueInput
-  }
-
-  export type ParticipantCreateNestedOneWithoutIceCandidatesInput = {
-    create?: XOR<ParticipantCreateWithoutIceCandidatesInput, ParticipantUncheckedCreateWithoutIceCandidatesInput>
-    connectOrCreate?: ParticipantCreateOrConnectWithoutIceCandidatesInput
-    connect?: ParticipantWhereUniqueInput
-  }
-
-  export type RoomUpdateOneRequiredWithoutIceCandidatesNestedInput = {
-    create?: XOR<RoomCreateWithoutIceCandidatesInput, RoomUncheckedCreateWithoutIceCandidatesInput>
-    connectOrCreate?: RoomCreateOrConnectWithoutIceCandidatesInput
-    upsert?: RoomUpsertWithoutIceCandidatesInput
-    connect?: RoomWhereUniqueInput
-    update?: XOR<XOR<RoomUpdateToOneWithWhereWithoutIceCandidatesInput, RoomUpdateWithoutIceCandidatesInput>, RoomUncheckedUpdateWithoutIceCandidatesInput>
-  }
-
-  export type ParticipantUpdateOneWithoutIceCandidatesNestedInput = {
-    create?: XOR<ParticipantCreateWithoutIceCandidatesInput, ParticipantUncheckedCreateWithoutIceCandidatesInput>
-    connectOrCreate?: ParticipantCreateOrConnectWithoutIceCandidatesInput
-    upsert?: ParticipantUpsertWithoutIceCandidatesInput
-    disconnect?: ParticipantWhereInput | boolean
-    delete?: ParticipantWhereInput | boolean
-    connect?: ParticipantWhereUniqueInput
-    update?: XOR<XOR<ParticipantUpdateToOneWithWhereWithoutIceCandidatesInput, ParticipantUpdateWithoutIceCandidatesInput>, ParticipantUncheckedUpdateWithoutIceCandidatesInput>
   }
 
   export type RoomCreateNestedOneWithoutMessagesInput = {
@@ -15266,24 +12414,24 @@ export namespace Prisma {
     id?: string
     title: string
     status?: $Enums.RoomStatus
+    scheduleTime?: Date | string | null
+    isDeleted?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     participants?: ParticipantCreateNestedManyWithoutRoomInput
     messages?: SignalingMessageCreateNestedManyWithoutRoomInput
-    offers?: OfferCreateNestedManyWithoutRoomInput
-    iceCandidates?: IceCandidateCreateNestedManyWithoutRoomInput
   }
 
   export type RoomUncheckedCreateWithoutUserInput = {
     id?: string
     title: string
     status?: $Enums.RoomStatus
+    scheduleTime?: Date | string | null
+    isDeleted?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     participants?: ParticipantUncheckedCreateNestedManyWithoutRoomInput
     messages?: SignalingMessageUncheckedCreateNestedManyWithoutRoomInput
-    offers?: OfferUncheckedCreateNestedManyWithoutRoomInput
-    iceCandidates?: IceCandidateUncheckedCreateNestedManyWithoutRoomInput
   }
 
   export type RoomCreateOrConnectWithoutUserInput = {
@@ -15304,7 +12452,6 @@ export namespace Prisma {
     room: RoomCreateNestedOneWithoutParticipantsInput
     sentMessages?: SignalingMessageCreateNestedManyWithoutFromInput
     receivedMessages?: SignalingMessageCreateNestedManyWithoutToInput
-    iceCandidates?: IceCandidateCreateNestedManyWithoutParticipantInput
   }
 
   export type ParticipantUncheckedCreateWithoutUserInput = {
@@ -15315,7 +12462,6 @@ export namespace Prisma {
     leftAt?: Date | string | null
     sentMessages?: SignalingMessageUncheckedCreateNestedManyWithoutFromInput
     receivedMessages?: SignalingMessageUncheckedCreateNestedManyWithoutToInput
-    iceCandidates?: IceCandidateUncheckedCreateNestedManyWithoutParticipantInput
   }
 
   export type ParticipantCreateOrConnectWithoutUserInput = {
@@ -15412,6 +12558,8 @@ export namespace Prisma {
     title?: StringFilter<"Room"> | string
     status?: EnumRoomStatusFilter<"Room"> | $Enums.RoomStatus
     userId?: StringFilter<"Room"> | string
+    scheduleTime?: DateTimeNullableFilter<"Room"> | Date | string | null
+    isDeleted?: BoolFilter<"Room"> | boolean
     createdAt?: DateTimeFilter<"Room"> | Date | string
     updatedAt?: DateTimeFilter<"Room"> | Date | string
   }
@@ -15497,7 +12645,6 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutParticipantsInput
     sentMessages?: SignalingMessageCreateNestedManyWithoutFromInput
     receivedMessages?: SignalingMessageCreateNestedManyWithoutToInput
-    iceCandidates?: IceCandidateCreateNestedManyWithoutParticipantInput
   }
 
   export type ParticipantUncheckedCreateWithoutRoomInput = {
@@ -15508,7 +12655,6 @@ export namespace Prisma {
     leftAt?: Date | string | null
     sentMessages?: SignalingMessageUncheckedCreateNestedManyWithoutFromInput
     receivedMessages?: SignalingMessageUncheckedCreateNestedManyWithoutToInput
-    iceCandidates?: IceCandidateUncheckedCreateNestedManyWithoutParticipantInput
   }
 
   export type ParticipantCreateOrConnectWithoutRoomInput = {
@@ -15548,52 +12694,6 @@ export namespace Prisma {
 
   export type SignalingMessageCreateManyRoomInputEnvelope = {
     data: SignalingMessageCreateManyRoomInput | SignalingMessageCreateManyRoomInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type OfferCreateWithoutRoomInput = {
-    id?: string
-    sdp: string
-    createdAt?: Date | string
-  }
-
-  export type OfferUncheckedCreateWithoutRoomInput = {
-    id?: string
-    sdp: string
-    createdAt?: Date | string
-  }
-
-  export type OfferCreateOrConnectWithoutRoomInput = {
-    where: OfferWhereUniqueInput
-    create: XOR<OfferCreateWithoutRoomInput, OfferUncheckedCreateWithoutRoomInput>
-  }
-
-  export type OfferCreateManyRoomInputEnvelope = {
-    data: OfferCreateManyRoomInput | OfferCreateManyRoomInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type IceCandidateCreateWithoutRoomInput = {
-    id?: string
-    candidate: string
-    createdAt?: Date | string
-    participant?: ParticipantCreateNestedOneWithoutIceCandidatesInput
-  }
-
-  export type IceCandidateUncheckedCreateWithoutRoomInput = {
-    id?: string
-    candidate: string
-    clientId: string
-    createdAt?: Date | string
-  }
-
-  export type IceCandidateCreateOrConnectWithoutRoomInput = {
-    where: IceCandidateWhereUniqueInput
-    create: XOR<IceCandidateCreateWithoutRoomInput, IceCandidateUncheckedCreateWithoutRoomInput>
-  }
-
-  export type IceCandidateCreateManyRoomInputEnvelope = {
-    data: IceCandidateCreateManyRoomInput | IceCandidateCreateManyRoomInput[]
     skipDuplicates?: boolean
   }
 
@@ -15694,69 +12794,16 @@ export namespace Prisma {
     processed?: BoolFilter<"SignalingMessage"> | boolean
   }
 
-  export type OfferUpsertWithWhereUniqueWithoutRoomInput = {
-    where: OfferWhereUniqueInput
-    update: XOR<OfferUpdateWithoutRoomInput, OfferUncheckedUpdateWithoutRoomInput>
-    create: XOR<OfferCreateWithoutRoomInput, OfferUncheckedCreateWithoutRoomInput>
-  }
-
-  export type OfferUpdateWithWhereUniqueWithoutRoomInput = {
-    where: OfferWhereUniqueInput
-    data: XOR<OfferUpdateWithoutRoomInput, OfferUncheckedUpdateWithoutRoomInput>
-  }
-
-  export type OfferUpdateManyWithWhereWithoutRoomInput = {
-    where: OfferScalarWhereInput
-    data: XOR<OfferUpdateManyMutationInput, OfferUncheckedUpdateManyWithoutRoomInput>
-  }
-
-  export type OfferScalarWhereInput = {
-    AND?: OfferScalarWhereInput | OfferScalarWhereInput[]
-    OR?: OfferScalarWhereInput[]
-    NOT?: OfferScalarWhereInput | OfferScalarWhereInput[]
-    id?: StringFilter<"Offer"> | string
-    roomId?: StringFilter<"Offer"> | string
-    sdp?: StringFilter<"Offer"> | string
-    createdAt?: DateTimeFilter<"Offer"> | Date | string
-  }
-
-  export type IceCandidateUpsertWithWhereUniqueWithoutRoomInput = {
-    where: IceCandidateWhereUniqueInput
-    update: XOR<IceCandidateUpdateWithoutRoomInput, IceCandidateUncheckedUpdateWithoutRoomInput>
-    create: XOR<IceCandidateCreateWithoutRoomInput, IceCandidateUncheckedCreateWithoutRoomInput>
-  }
-
-  export type IceCandidateUpdateWithWhereUniqueWithoutRoomInput = {
-    where: IceCandidateWhereUniqueInput
-    data: XOR<IceCandidateUpdateWithoutRoomInput, IceCandidateUncheckedUpdateWithoutRoomInput>
-  }
-
-  export type IceCandidateUpdateManyWithWhereWithoutRoomInput = {
-    where: IceCandidateScalarWhereInput
-    data: XOR<IceCandidateUpdateManyMutationInput, IceCandidateUncheckedUpdateManyWithoutRoomInput>
-  }
-
-  export type IceCandidateScalarWhereInput = {
-    AND?: IceCandidateScalarWhereInput | IceCandidateScalarWhereInput[]
-    OR?: IceCandidateScalarWhereInput[]
-    NOT?: IceCandidateScalarWhereInput | IceCandidateScalarWhereInput[]
-    id?: StringFilter<"IceCandidate"> | string
-    roomId?: StringFilter<"IceCandidate"> | string
-    candidate?: StringFilter<"IceCandidate"> | string
-    clientId?: StringFilter<"IceCandidate"> | string
-    createdAt?: DateTimeFilter<"IceCandidate"> | Date | string
-  }
-
   export type RoomCreateWithoutParticipantsInput = {
     id?: string
     title: string
     status?: $Enums.RoomStatus
+    scheduleTime?: Date | string | null
+    isDeleted?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutRoomsInput
     messages?: SignalingMessageCreateNestedManyWithoutRoomInput
-    offers?: OfferCreateNestedManyWithoutRoomInput
-    iceCandidates?: IceCandidateCreateNestedManyWithoutRoomInput
   }
 
   export type RoomUncheckedCreateWithoutParticipantsInput = {
@@ -15764,11 +12811,11 @@ export namespace Prisma {
     title: string
     status?: $Enums.RoomStatus
     userId: string
+    scheduleTime?: Date | string | null
+    isDeleted?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     messages?: SignalingMessageUncheckedCreateNestedManyWithoutRoomInput
-    offers?: OfferUncheckedCreateNestedManyWithoutRoomInput
-    iceCandidates?: IceCandidateUncheckedCreateNestedManyWithoutRoomInput
   }
 
   export type RoomCreateOrConnectWithoutParticipantsInput = {
@@ -15881,30 +12928,6 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type IceCandidateCreateWithoutParticipantInput = {
-    id?: string
-    candidate: string
-    createdAt?: Date | string
-    room: RoomCreateNestedOneWithoutIceCandidatesInput
-  }
-
-  export type IceCandidateUncheckedCreateWithoutParticipantInput = {
-    id?: string
-    roomId: string
-    candidate: string
-    createdAt?: Date | string
-  }
-
-  export type IceCandidateCreateOrConnectWithoutParticipantInput = {
-    where: IceCandidateWhereUniqueInput
-    create: XOR<IceCandidateCreateWithoutParticipantInput, IceCandidateUncheckedCreateWithoutParticipantInput>
-  }
-
-  export type IceCandidateCreateManyParticipantInputEnvelope = {
-    data: IceCandidateCreateManyParticipantInput | IceCandidateCreateManyParticipantInput[]
-    skipDuplicates?: boolean
-  }
-
   export type RoomUpsertWithoutParticipantsInput = {
     update: XOR<RoomUpdateWithoutParticipantsInput, RoomUncheckedUpdateWithoutParticipantsInput>
     create: XOR<RoomCreateWithoutParticipantsInput, RoomUncheckedCreateWithoutParticipantsInput>
@@ -15920,12 +12943,12 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     status?: EnumRoomStatusFieldUpdateOperationsInput | $Enums.RoomStatus
+    scheduleTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutRoomsNestedInput
     messages?: SignalingMessageUpdateManyWithoutRoomNestedInput
-    offers?: OfferUpdateManyWithoutRoomNestedInput
-    iceCandidates?: IceCandidateUpdateManyWithoutRoomNestedInput
   }
 
   export type RoomUncheckedUpdateWithoutParticipantsInput = {
@@ -15933,11 +12956,11 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     status?: EnumRoomStatusFieldUpdateOperationsInput | $Enums.RoomStatus
     userId?: StringFieldUpdateOperationsInput | string
+    scheduleTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     messages?: SignalingMessageUncheckedUpdateManyWithoutRoomNestedInput
-    offers?: OfferUncheckedUpdateManyWithoutRoomNestedInput
-    iceCandidates?: IceCandidateUncheckedUpdateManyWithoutRoomNestedInput
   }
 
   export type UserUpsertWithoutParticipantsInput = {
@@ -16023,220 +13046,16 @@ export namespace Prisma {
     data: XOR<SignalingMessageUpdateManyMutationInput, SignalingMessageUncheckedUpdateManyWithoutToInput>
   }
 
-  export type IceCandidateUpsertWithWhereUniqueWithoutParticipantInput = {
-    where: IceCandidateWhereUniqueInput
-    update: XOR<IceCandidateUpdateWithoutParticipantInput, IceCandidateUncheckedUpdateWithoutParticipantInput>
-    create: XOR<IceCandidateCreateWithoutParticipantInput, IceCandidateUncheckedCreateWithoutParticipantInput>
-  }
-
-  export type IceCandidateUpdateWithWhereUniqueWithoutParticipantInput = {
-    where: IceCandidateWhereUniqueInput
-    data: XOR<IceCandidateUpdateWithoutParticipantInput, IceCandidateUncheckedUpdateWithoutParticipantInput>
-  }
-
-  export type IceCandidateUpdateManyWithWhereWithoutParticipantInput = {
-    where: IceCandidateScalarWhereInput
-    data: XOR<IceCandidateUpdateManyMutationInput, IceCandidateUncheckedUpdateManyWithoutParticipantInput>
-  }
-
-  export type RoomCreateWithoutOffersInput = {
-    id?: string
-    title: string
-    status?: $Enums.RoomStatus
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutRoomsInput
-    participants?: ParticipantCreateNestedManyWithoutRoomInput
-    messages?: SignalingMessageCreateNestedManyWithoutRoomInput
-    iceCandidates?: IceCandidateCreateNestedManyWithoutRoomInput
-  }
-
-  export type RoomUncheckedCreateWithoutOffersInput = {
-    id?: string
-    title: string
-    status?: $Enums.RoomStatus
-    userId: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    participants?: ParticipantUncheckedCreateNestedManyWithoutRoomInput
-    messages?: SignalingMessageUncheckedCreateNestedManyWithoutRoomInput
-    iceCandidates?: IceCandidateUncheckedCreateNestedManyWithoutRoomInput
-  }
-
-  export type RoomCreateOrConnectWithoutOffersInput = {
-    where: RoomWhereUniqueInput
-    create: XOR<RoomCreateWithoutOffersInput, RoomUncheckedCreateWithoutOffersInput>
-  }
-
-  export type RoomUpsertWithoutOffersInput = {
-    update: XOR<RoomUpdateWithoutOffersInput, RoomUncheckedUpdateWithoutOffersInput>
-    create: XOR<RoomCreateWithoutOffersInput, RoomUncheckedCreateWithoutOffersInput>
-    where?: RoomWhereInput
-  }
-
-  export type RoomUpdateToOneWithWhereWithoutOffersInput = {
-    where?: RoomWhereInput
-    data: XOR<RoomUpdateWithoutOffersInput, RoomUncheckedUpdateWithoutOffersInput>
-  }
-
-  export type RoomUpdateWithoutOffersInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    title?: StringFieldUpdateOperationsInput | string
-    status?: EnumRoomStatusFieldUpdateOperationsInput | $Enums.RoomStatus
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutRoomsNestedInput
-    participants?: ParticipantUpdateManyWithoutRoomNestedInput
-    messages?: SignalingMessageUpdateManyWithoutRoomNestedInput
-    iceCandidates?: IceCandidateUpdateManyWithoutRoomNestedInput
-  }
-
-  export type RoomUncheckedUpdateWithoutOffersInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    title?: StringFieldUpdateOperationsInput | string
-    status?: EnumRoomStatusFieldUpdateOperationsInput | $Enums.RoomStatus
-    userId?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    participants?: ParticipantUncheckedUpdateManyWithoutRoomNestedInput
-    messages?: SignalingMessageUncheckedUpdateManyWithoutRoomNestedInput
-    iceCandidates?: IceCandidateUncheckedUpdateManyWithoutRoomNestedInput
-  }
-
-  export type RoomCreateWithoutIceCandidatesInput = {
-    id?: string
-    title: string
-    status?: $Enums.RoomStatus
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutRoomsInput
-    participants?: ParticipantCreateNestedManyWithoutRoomInput
-    messages?: SignalingMessageCreateNestedManyWithoutRoomInput
-    offers?: OfferCreateNestedManyWithoutRoomInput
-  }
-
-  export type RoomUncheckedCreateWithoutIceCandidatesInput = {
-    id?: string
-    title: string
-    status?: $Enums.RoomStatus
-    userId: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    participants?: ParticipantUncheckedCreateNestedManyWithoutRoomInput
-    messages?: SignalingMessageUncheckedCreateNestedManyWithoutRoomInput
-    offers?: OfferUncheckedCreateNestedManyWithoutRoomInput
-  }
-
-  export type RoomCreateOrConnectWithoutIceCandidatesInput = {
-    where: RoomWhereUniqueInput
-    create: XOR<RoomCreateWithoutIceCandidatesInput, RoomUncheckedCreateWithoutIceCandidatesInput>
-  }
-
-  export type ParticipantCreateWithoutIceCandidatesInput = {
-    id?: string
-    role?: $Enums.Role
-    joinedAt?: Date | string
-    leftAt?: Date | string | null
-    room: RoomCreateNestedOneWithoutParticipantsInput
-    user: UserCreateNestedOneWithoutParticipantsInput
-    sentMessages?: SignalingMessageCreateNestedManyWithoutFromInput
-    receivedMessages?: SignalingMessageCreateNestedManyWithoutToInput
-  }
-
-  export type ParticipantUncheckedCreateWithoutIceCandidatesInput = {
-    id?: string
-    userId: string
-    roomId: string
-    role?: $Enums.Role
-    joinedAt?: Date | string
-    leftAt?: Date | string | null
-    sentMessages?: SignalingMessageUncheckedCreateNestedManyWithoutFromInput
-    receivedMessages?: SignalingMessageUncheckedCreateNestedManyWithoutToInput
-  }
-
-  export type ParticipantCreateOrConnectWithoutIceCandidatesInput = {
-    where: ParticipantWhereUniqueInput
-    create: XOR<ParticipantCreateWithoutIceCandidatesInput, ParticipantUncheckedCreateWithoutIceCandidatesInput>
-  }
-
-  export type RoomUpsertWithoutIceCandidatesInput = {
-    update: XOR<RoomUpdateWithoutIceCandidatesInput, RoomUncheckedUpdateWithoutIceCandidatesInput>
-    create: XOR<RoomCreateWithoutIceCandidatesInput, RoomUncheckedCreateWithoutIceCandidatesInput>
-    where?: RoomWhereInput
-  }
-
-  export type RoomUpdateToOneWithWhereWithoutIceCandidatesInput = {
-    where?: RoomWhereInput
-    data: XOR<RoomUpdateWithoutIceCandidatesInput, RoomUncheckedUpdateWithoutIceCandidatesInput>
-  }
-
-  export type RoomUpdateWithoutIceCandidatesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    title?: StringFieldUpdateOperationsInput | string
-    status?: EnumRoomStatusFieldUpdateOperationsInput | $Enums.RoomStatus
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutRoomsNestedInput
-    participants?: ParticipantUpdateManyWithoutRoomNestedInput
-    messages?: SignalingMessageUpdateManyWithoutRoomNestedInput
-    offers?: OfferUpdateManyWithoutRoomNestedInput
-  }
-
-  export type RoomUncheckedUpdateWithoutIceCandidatesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    title?: StringFieldUpdateOperationsInput | string
-    status?: EnumRoomStatusFieldUpdateOperationsInput | $Enums.RoomStatus
-    userId?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    participants?: ParticipantUncheckedUpdateManyWithoutRoomNestedInput
-    messages?: SignalingMessageUncheckedUpdateManyWithoutRoomNestedInput
-    offers?: OfferUncheckedUpdateManyWithoutRoomNestedInput
-  }
-
-  export type ParticipantUpsertWithoutIceCandidatesInput = {
-    update: XOR<ParticipantUpdateWithoutIceCandidatesInput, ParticipantUncheckedUpdateWithoutIceCandidatesInput>
-    create: XOR<ParticipantCreateWithoutIceCandidatesInput, ParticipantUncheckedCreateWithoutIceCandidatesInput>
-    where?: ParticipantWhereInput
-  }
-
-  export type ParticipantUpdateToOneWithWhereWithoutIceCandidatesInput = {
-    where?: ParticipantWhereInput
-    data: XOR<ParticipantUpdateWithoutIceCandidatesInput, ParticipantUncheckedUpdateWithoutIceCandidatesInput>
-  }
-
-  export type ParticipantUpdateWithoutIceCandidatesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
-    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    leftAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    room?: RoomUpdateOneRequiredWithoutParticipantsNestedInput
-    user?: UserUpdateOneRequiredWithoutParticipantsNestedInput
-    sentMessages?: SignalingMessageUpdateManyWithoutFromNestedInput
-    receivedMessages?: SignalingMessageUpdateManyWithoutToNestedInput
-  }
-
-  export type ParticipantUncheckedUpdateWithoutIceCandidatesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    roomId?: StringFieldUpdateOperationsInput | string
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
-    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    leftAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    sentMessages?: SignalingMessageUncheckedUpdateManyWithoutFromNestedInput
-    receivedMessages?: SignalingMessageUncheckedUpdateManyWithoutToNestedInput
-  }
-
   export type RoomCreateWithoutMessagesInput = {
     id?: string
     title: string
     status?: $Enums.RoomStatus
+    scheduleTime?: Date | string | null
+    isDeleted?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutRoomsInput
     participants?: ParticipantCreateNestedManyWithoutRoomInput
-    offers?: OfferCreateNestedManyWithoutRoomInput
-    iceCandidates?: IceCandidateCreateNestedManyWithoutRoomInput
   }
 
   export type RoomUncheckedCreateWithoutMessagesInput = {
@@ -16244,11 +13063,11 @@ export namespace Prisma {
     title: string
     status?: $Enums.RoomStatus
     userId: string
+    scheduleTime?: Date | string | null
+    isDeleted?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     participants?: ParticipantUncheckedCreateNestedManyWithoutRoomInput
-    offers?: OfferUncheckedCreateNestedManyWithoutRoomInput
-    iceCandidates?: IceCandidateUncheckedCreateNestedManyWithoutRoomInput
   }
 
   export type RoomCreateOrConnectWithoutMessagesInput = {
@@ -16264,7 +13083,6 @@ export namespace Prisma {
     room: RoomCreateNestedOneWithoutParticipantsInput
     user: UserCreateNestedOneWithoutParticipantsInput
     receivedMessages?: SignalingMessageCreateNestedManyWithoutToInput
-    iceCandidates?: IceCandidateCreateNestedManyWithoutParticipantInput
   }
 
   export type ParticipantUncheckedCreateWithoutSentMessagesInput = {
@@ -16275,7 +13093,6 @@ export namespace Prisma {
     joinedAt?: Date | string
     leftAt?: Date | string | null
     receivedMessages?: SignalingMessageUncheckedCreateNestedManyWithoutToInput
-    iceCandidates?: IceCandidateUncheckedCreateNestedManyWithoutParticipantInput
   }
 
   export type ParticipantCreateOrConnectWithoutSentMessagesInput = {
@@ -16291,7 +13108,6 @@ export namespace Prisma {
     room: RoomCreateNestedOneWithoutParticipantsInput
     user: UserCreateNestedOneWithoutParticipantsInput
     sentMessages?: SignalingMessageCreateNestedManyWithoutFromInput
-    iceCandidates?: IceCandidateCreateNestedManyWithoutParticipantInput
   }
 
   export type ParticipantUncheckedCreateWithoutReceivedMessagesInput = {
@@ -16302,7 +13118,6 @@ export namespace Prisma {
     joinedAt?: Date | string
     leftAt?: Date | string | null
     sentMessages?: SignalingMessageUncheckedCreateNestedManyWithoutFromInput
-    iceCandidates?: IceCandidateUncheckedCreateNestedManyWithoutParticipantInput
   }
 
   export type ParticipantCreateOrConnectWithoutReceivedMessagesInput = {
@@ -16325,12 +13140,12 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     status?: EnumRoomStatusFieldUpdateOperationsInput | $Enums.RoomStatus
+    scheduleTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutRoomsNestedInput
     participants?: ParticipantUpdateManyWithoutRoomNestedInput
-    offers?: OfferUpdateManyWithoutRoomNestedInput
-    iceCandidates?: IceCandidateUpdateManyWithoutRoomNestedInput
   }
 
   export type RoomUncheckedUpdateWithoutMessagesInput = {
@@ -16338,11 +13153,11 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     status?: EnumRoomStatusFieldUpdateOperationsInput | $Enums.RoomStatus
     userId?: StringFieldUpdateOperationsInput | string
+    scheduleTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     participants?: ParticipantUncheckedUpdateManyWithoutRoomNestedInput
-    offers?: OfferUncheckedUpdateManyWithoutRoomNestedInput
-    iceCandidates?: IceCandidateUncheckedUpdateManyWithoutRoomNestedInput
   }
 
   export type ParticipantUpsertWithoutSentMessagesInput = {
@@ -16364,7 +13179,6 @@ export namespace Prisma {
     room?: RoomUpdateOneRequiredWithoutParticipantsNestedInput
     user?: UserUpdateOneRequiredWithoutParticipantsNestedInput
     receivedMessages?: SignalingMessageUpdateManyWithoutToNestedInput
-    iceCandidates?: IceCandidateUpdateManyWithoutParticipantNestedInput
   }
 
   export type ParticipantUncheckedUpdateWithoutSentMessagesInput = {
@@ -16375,7 +13189,6 @@ export namespace Prisma {
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedMessages?: SignalingMessageUncheckedUpdateManyWithoutToNestedInput
-    iceCandidates?: IceCandidateUncheckedUpdateManyWithoutParticipantNestedInput
   }
 
   export type ParticipantUpsertWithoutReceivedMessagesInput = {
@@ -16397,7 +13210,6 @@ export namespace Prisma {
     room?: RoomUpdateOneRequiredWithoutParticipantsNestedInput
     user?: UserUpdateOneRequiredWithoutParticipantsNestedInput
     sentMessages?: SignalingMessageUpdateManyWithoutFromNestedInput
-    iceCandidates?: IceCandidateUpdateManyWithoutParticipantNestedInput
   }
 
   export type ParticipantUncheckedUpdateWithoutReceivedMessagesInput = {
@@ -16408,7 +13220,6 @@ export namespace Prisma {
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     sentMessages?: SignalingMessageUncheckedUpdateManyWithoutFromNestedInput
-    iceCandidates?: IceCandidateUncheckedUpdateManyWithoutParticipantNestedInput
   }
 
   export type AccountCreateManyUserInput = {
@@ -16435,6 +13246,8 @@ export namespace Prisma {
     id?: string
     title: string
     status?: $Enums.RoomStatus
+    scheduleTime?: Date | string | null
+    isDeleted?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -16511,30 +13324,32 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     status?: EnumRoomStatusFieldUpdateOperationsInput | $Enums.RoomStatus
+    scheduleTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     participants?: ParticipantUpdateManyWithoutRoomNestedInput
     messages?: SignalingMessageUpdateManyWithoutRoomNestedInput
-    offers?: OfferUpdateManyWithoutRoomNestedInput
-    iceCandidates?: IceCandidateUpdateManyWithoutRoomNestedInput
   }
 
   export type RoomUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     status?: EnumRoomStatusFieldUpdateOperationsInput | $Enums.RoomStatus
+    scheduleTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     participants?: ParticipantUncheckedUpdateManyWithoutRoomNestedInput
     messages?: SignalingMessageUncheckedUpdateManyWithoutRoomNestedInput
-    offers?: OfferUncheckedUpdateManyWithoutRoomNestedInput
-    iceCandidates?: IceCandidateUncheckedUpdateManyWithoutRoomNestedInput
   }
 
   export type RoomUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     status?: EnumRoomStatusFieldUpdateOperationsInput | $Enums.RoomStatus
+    scheduleTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -16547,7 +13362,6 @@ export namespace Prisma {
     room?: RoomUpdateOneRequiredWithoutParticipantsNestedInput
     sentMessages?: SignalingMessageUpdateManyWithoutFromNestedInput
     receivedMessages?: SignalingMessageUpdateManyWithoutToNestedInput
-    iceCandidates?: IceCandidateUpdateManyWithoutParticipantNestedInput
   }
 
   export type ParticipantUncheckedUpdateWithoutUserInput = {
@@ -16558,7 +13372,6 @@ export namespace Prisma {
     leftAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     sentMessages?: SignalingMessageUncheckedUpdateManyWithoutFromNestedInput
     receivedMessages?: SignalingMessageUncheckedUpdateManyWithoutToNestedInput
-    iceCandidates?: IceCandidateUncheckedUpdateManyWithoutParticipantNestedInput
   }
 
   export type ParticipantUncheckedUpdateManyWithoutUserInput = {
@@ -16587,19 +13400,6 @@ export namespace Prisma {
     processed?: boolean
   }
 
-  export type OfferCreateManyRoomInput = {
-    id?: string
-    sdp: string
-    createdAt?: Date | string
-  }
-
-  export type IceCandidateCreateManyRoomInput = {
-    id?: string
-    candidate: string
-    clientId: string
-    createdAt?: Date | string
-  }
-
   export type ParticipantUpdateWithoutRoomInput = {
     id?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -16608,7 +13408,6 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutParticipantsNestedInput
     sentMessages?: SignalingMessageUpdateManyWithoutFromNestedInput
     receivedMessages?: SignalingMessageUpdateManyWithoutToNestedInput
-    iceCandidates?: IceCandidateUpdateManyWithoutParticipantNestedInput
   }
 
   export type ParticipantUncheckedUpdateWithoutRoomInput = {
@@ -16619,7 +13418,6 @@ export namespace Prisma {
     leftAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     sentMessages?: SignalingMessageUncheckedUpdateManyWithoutFromNestedInput
     receivedMessages?: SignalingMessageUncheckedUpdateManyWithoutToNestedInput
-    iceCandidates?: IceCandidateUncheckedUpdateManyWithoutParticipantNestedInput
   }
 
   export type ParticipantUncheckedUpdateManyWithoutRoomInput = {
@@ -16660,45 +13458,6 @@ export namespace Prisma {
     processed?: BoolFieldUpdateOperationsInput | boolean
   }
 
-  export type OfferUpdateWithoutRoomInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    sdp?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type OfferUncheckedUpdateWithoutRoomInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    sdp?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type OfferUncheckedUpdateManyWithoutRoomInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    sdp?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type IceCandidateUpdateWithoutRoomInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    candidate?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    participant?: ParticipantUpdateOneWithoutIceCandidatesNestedInput
-  }
-
-  export type IceCandidateUncheckedUpdateWithoutRoomInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    candidate?: StringFieldUpdateOperationsInput | string
-    clientId?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type IceCandidateUncheckedUpdateManyWithoutRoomInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    candidate?: StringFieldUpdateOperationsInput | string
-    clientId?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
   export type SignalingMessageCreateManyFromInput = {
     id?: string
     type: $Enums.MessageType
@@ -16717,13 +13476,6 @@ export namespace Prisma {
     data: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     processed?: boolean
-  }
-
-  export type IceCandidateCreateManyParticipantInput = {
-    id?: string
-    roomId: string
-    candidate: string
-    createdAt?: Date | string
   }
 
   export type SignalingMessageUpdateWithoutFromInput = {
@@ -16784,27 +13536,6 @@ export namespace Prisma {
     data?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     processed?: BoolFieldUpdateOperationsInput | boolean
-  }
-
-  export type IceCandidateUpdateWithoutParticipantInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    candidate?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    room?: RoomUpdateOneRequiredWithoutIceCandidatesNestedInput
-  }
-
-  export type IceCandidateUncheckedUpdateWithoutParticipantInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    roomId?: StringFieldUpdateOperationsInput | string
-    candidate?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type IceCandidateUncheckedUpdateManyWithoutParticipantInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    roomId?: StringFieldUpdateOperationsInput | string
-    candidate?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 
