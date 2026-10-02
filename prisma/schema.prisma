@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── better-auth tables (do not rename — adapter expects these) ──────────────
+
+model User {
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
+  sessions      Session[]
+  accounts      Account[]
+
+  // App relations
+  ownedStudios  Studio[]
+  memberships   StudioMember[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
+
+// ─── App models ──────────────────────────────────────────────────────────────
+
+model Studio {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  ownerId   String
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  members  StudioMember[]
+  sessions StudioSession[]
+}
+
+enum MemberRole {
+  HOST
+  COGUEST
+}
+
+model StudioMember {
+  id       String     @id @default(cuid())
+  studioId String
+  studio   Studio     @relation(fields: [studioId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role     MemberRole @default(COGUEST)
+
+  @@unique([studioId, userId])
+}
+
+model StudioSession {
+  id        String    @id @default(cuid())
+  studioId  String
+  studio    Studio    @relation(fields: [studioId], references: [id], onDelete: Cascade)
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
+
+  messages ChatMessage[]
+}
+
+model ChatMessage {
+  id        String        @id @default(cuid())
+  sessionId String
+  session   StudioSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  // senderId is null for anonymous/guest senders (display name only)
+  senderId  String?
+  senderName String
+  body      String
+  createdAt DateTime      @default(now())
+}
