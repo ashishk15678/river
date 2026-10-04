@@ -1,7 +1,7 @@
 "use client";
 
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
-import type { RemotePeer } from "@/hooks/use-studio-call";
+import type { RemotePeer, Overlay } from "@/hooks/use-studio-call";
 
 type Layout = "solo" | "grid" | "spotlight";
 type Rect = [number, number, number, number];
@@ -81,10 +81,25 @@ export const StudioCanvas = forwardRef<
     localName: string;
     peers: Record<string, RemotePeer>;
     layout: Layout;
+    /** socket ID of the spotlighted peer (null = none) */
+    spotlight?: string | null;
+    /** set of socket IDs with raised hands */
+    raisedHands?: Set<string>;
+    overlays?: Overlay[];
     className?: string;
   }
 >(function StudioCanvas(
-  { localStream, localScreen = null, localName, peers, layout, className },
+  {
+    localStream,
+    localScreen = null,
+    localName,
+    peers,
+    layout,
+    spotlight = null,
+    raisedHands = new Set(),
+    overlays = [],
+    className,
+  },
   ref,
 ) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -93,9 +108,14 @@ export const StudioCanvas = forwardRef<
   const videos = useRef<Map<string, HTMLVideoElement>>(new Map());
   const tilesRef = useRef<Tile[]>([]);
   const layoutRef = useRef<Layout>(layout);
+  const spotlightRef = useRef(spotlight);
+  const raisedHandsRef = useRef(raisedHands);
+  const overlaysRef = useRef(overlays);
+  const logoCache = useRef<Map<string, HTMLImageElement>>(new Map());
 
   // Screens first so spotlight / solo show the shared screen.
-  const tiles: Tile[] = [
+  // If a spotlight peer is set, move them to index 0.
+  const rawTiles: Tile[] = [
     ...(localScreen
       ? [
           {
@@ -135,12 +155,24 @@ export const StudioCanvas = forwardRef<
       isScreen: false,
     })),
   ];
+
+  // Move spotlighted tile to front so it gets the main spotlight rect.
+  const tiles: Tile[] = spotlight
+    ? [
+        ...rawTiles.filter((t) => t.key === spotlight),
+        ...rawTiles.filter((t) => t.key !== spotlight),
+      ]
+    : rawTiles;
+
   tilesRef.current = tiles;
   layoutRef.current = layout;
+  spotlightRef.current = spotlight;
+  raisedHandsRef.current = raisedHands;
+  overlaysRef.current = overlays;
 
-  const signature = tiles
-    .map((t) => `${t.key}=${t.stream?.id ?? ""}`)
-    .join("|");
+  const signature =
+    tiles.map((t) => `${t.key}=${t.stream?.id ?? ""}`).join("|") +
+    `|sp=${spotlight ?? ""}|rh=${[...raisedHands].join(",")}|ov=${overlays.length}`;
 
   // One off-DOM <video> per tile: gives the canvas decoded frames and plays
   // remote audio (remote videos are unmuted, local ones muted to avoid echo).
@@ -242,7 +274,98 @@ export const StudioCanvas = forwardRef<
         ctx.fillRect(x + 6, y + h - 32, textW + 16, 24);
         ctx.fillStyle = "#ffffff";
         ctx.fillText(t.label, x + 14, y + h - 14);
+
+        // Raised-hand indicator on the tile
+        if (!t.isLocal && !t.isScreen && raisedHandsRef.current.has(t.key)) {
+          ctx.font = "bold 20px sans-serif";
+          ctx.fillText("✋", x + w - 32, y + 28);
+        }
       });
+
+      // ── Overlays (drawn over all tiles) ─────────────────────────────────
+      const ovs = overlaysRef.current;
+
+      for (const ov of ovs) {
+        if (ov.kind === "onair") {
+          // Red pulsing dot + "ON AIR" text, top-left corner
+          ctx.fillStyle = "#dc2626";
+          ctx.beginPath();
+          ctx.arc(20, 20, 8, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.font = "bold 16px sans-serif";
+          ctx.fillStyle = "#ffffff";
+          ctx.fillText("ON AIR", 34, 26);
+        }
+
+        if (ov.kind === "banner") {
+          // Full-width scrolling ticker at the bottom
+          const bannerH = 40;
+          const y0 = H - bannerH;
+          ctx.fillStyle = "#1d4ed8";
+          ctx.fillRect(0, y0, W, bannerH);
+          ctx.font = "bold 20px sans-serif";
+          ctx.fillStyle = "#ffffff";
+          ctx.textBaseline = "middle";
+          ctx.fillText(ov.text, 16, y0 + bannerH / 2, W - 32);
+          ctx.textBaseline = "alphabetic";
+        }
+
+        if (ov.kind === "lower-third") {
+          // Find the tile for this socketId and draw the lower-third on it
+          const tileIdx = tilesRef.current.findIndex(
+            (t) => t.key === ov.socketId || t.key === "local",
+          );
+          const r = tileRects(tilesRef.current.length, layoutRef.current)[
+            tileIdx
+          ];
+          if (r) {
+            const [tx, ty, tw, th] = r;
+            const ltH = 56;
+            const ltY = ty + th - ltH - 4;
+            // Background bar
+            ctx.fillStyle = "#1d4ed8";
+            ctx.fillRect(tx + 4, ltY, tw - 8, ltH);
+            // Accent stripe
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(tx + 4, ltY, 4, ltH);
+            // Title
+            ctx.font = "bold 18px sans-serif";
+            ctx.fillStyle = "#ffffff";
+            ctx.fillText(ov.title, tx + 16, ltY + 22, tw - 24);
+            // Subtitle
+            ctx.font = "14px sans-serif";
+            ctx.fillStyle = "rgba(255,255,255,0.8)";
+            ctx.fillText(ov.subtitle, tx + 16, ltY + 44, tw - 24);
+          }
+        }
+
+        if (ov.kind === "logo" && ov.dataUrl) {
+          // Cache the image object; draw once it's loaded
+          let img = logoCache.current.get(ov.dataUrl);
+          if (!img) {
+            img = new Image();
+            img.src = ov.dataUrl;
+            logoCache.current.set(ov.dataUrl, img);
+          }
+          if (img.complete && img.naturalWidth > 0) {
+            const maxSide = 120;
+            const scale = Math.min(
+              maxSide / img.naturalWidth,
+              maxSide / img.naturalHeight,
+            );
+            const iw = img.naturalWidth * scale;
+            const ih = img.naturalHeight * scale;
+            const pad = 12;
+            let ix = pad;
+            let iy = pad;
+            if (ov.position === "tr" || ov.position === "br") ix = W - iw - pad;
+            if (ov.position === "bl" || ov.position === "br") iy = H - ih - pad;
+            ctx.globalAlpha = 0.85;
+            ctx.drawImage(img, ix, iy, iw, ih);
+            ctx.globalAlpha = 1;
+          }
+        }
+      }
 
       raf = requestAnimationFrame(draw);
     };

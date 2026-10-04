@@ -21,14 +21,21 @@ import { createRouter, createWebRtcTransport } from "@/server/mediasoup";
 //   ms:closeProducer    { producerId }
 //
 // client -> server (fire & forget)
-//   chat:send    { body }
-//   host:mute    { targetSocketId }
-//   host:remove  { targetSocketId }
-//   host:layout  { layout }
+//   chat:send        { body }
+//   host:mute        { targetSocketId }
+//   host:remove      { targetSocketId }
+//   host:stopCam     { targetSocketId }
+//   host:layout      { layout }
+//   host:spotlight   { socketId | null }
+//   host:overlays    { overlays: Overlay[] }
+//   peer:raiseHand
+//   peer:lowerHand
 //
 // server -> client
 //   peer:joined / peer:left / ms:newProducer / ms:producerClosed
-//   chat:message / host:muted / host:removed / host:layout
+//   chat:message / host:muted / host:camStopped / host:removed
+//   host:layout / host:spotlight / host:overlays
+//   peer:raiseHand / peer:lowerHand
 // ─────────────────────────────────────────────────────────────────────────────
 
 type Layout = "solo" | "grid" | "spotlight";
@@ -368,12 +375,10 @@ export function attachSocketServer(httpServer: HTTPServer) {
       if (!producer) return;
       producer.close();
       peer.producers.delete(producer.id);
-      socket
-        .to(room.id)
-        .emit("ms:producerClosed", {
-          producerId: producer.id,
-          socketId: socket.id,
-        });
+      socket.to(room.id).emit("ms:producerClosed", {
+        producerId: producer.id,
+        socketId: socket.id,
+      });
     });
 
     // ── chat ───────────────────────────────────────────────────────────────
@@ -434,6 +439,63 @@ export function attachSocketServer(httpServer: HTTPServer) {
         return;
       room.layout = layout;
       io.in(room.id).emit("host:layout", { layout });
+    });
+
+    // ── new host controls ──────────────────────────────────────────────────
+
+    // Stop a guest's camera (server-side: pause their cam producer).
+    on<{ targetSocketId?: unknown }>("host:stopCam", ({ targetSocketId }) => {
+      const { room } = needHost();
+      const target =
+        typeof targetSocketId === "string"
+          ? room.peers.get(targetSocketId)
+          : null;
+      if (!target) return;
+      target.producers.forEach((p) => {
+        if (p.appData.source === "cam") void p.pause();
+      });
+      io.to(target.socketId).emit("host:camStopped", { targetSocketId });
+    });
+
+    // Host spotlights a participant (sets them as primary in spotlight layout).
+    // Null clears the spotlight override.
+    on<{ socketId?: unknown }>("host:spotlight", ({ socketId }) => {
+      const { room } = needHost();
+      const id = typeof socketId === "string" ? socketId : null;
+      if (id !== null && !room.peers.has(id)) return;
+      io.in(room.id).emit("host:spotlight", { socketId: id });
+    });
+
+    // Overlays — host broadcasts the current overlay config to all peers so
+    // every client's canvas renders the same overlays.
+    on<{ overlays?: unknown }>("host:overlays", ({ overlays }) => {
+      needHost();
+      // Basic shape validation — we don't fully type-check here; the client
+      // validates before sending and the canvas ignores unknown fields.
+      if (!Array.isArray(overlays)) return;
+      io.in(need().room.id).emit("host:overlays", { overlays });
+    });
+
+    // Raise / lower hand (any participant, not host-gated).
+    socket.on("peer:raiseHand", () => {
+      if (!current) return;
+      io.in(current.room.id).emit("peer:raiseHand", { socketId: socket.id });
+    });
+    socket.on("peer:lowerHand", () => {
+      if (!current) return;
+      io.in(current.room.id).emit("peer:lowerHand", { socketId: socket.id });
+    });
+
+    // Emoji reactions — broadcast to the whole room with the sender's name.
+    socket.on("peer:sendReaction", ({ emoji }: { emoji?: unknown }) => {
+      if (!current || typeof emoji !== "string") return;
+      const safe = emoji.trim().slice(0, 8); // cap to one emoji cluster
+      if (!safe) return;
+      io.in(current.room.id).emit("peer:reaction", {
+        socketId: socket.id,
+        name: current.peer.name,
+        emoji: safe,
+      });
     });
 
     // "disconnecting" (not "disconnect") fires while the socket is still in

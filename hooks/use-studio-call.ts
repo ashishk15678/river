@@ -16,6 +16,8 @@ export interface RemotePeer {
   stream: MediaStream | null;
   /** screen share (video only) */
   screen: MediaStream | null;
+  /** true when the peer's mic producer is paused */
+  audioMuted: boolean;
 }
 
 export interface ChatMessage {
@@ -24,6 +26,43 @@ export interface ChatMessage {
   body: string;
   createdAt: string | Date;
 }
+
+export interface Reaction {
+  id: string;
+  socketId: string;
+  name: string;
+  emoji: string;
+}
+
+// ── Overlay types ─────────────────────────────────────────────────────────────
+
+export type OverlayKind = "lower-third" | "banner" | "onair" | "logo";
+
+export interface LowerThirdOverlay {
+  id: string;
+  kind: "lower-third";
+  socketId: string;
+  title: string;
+  subtitle: string;
+}
+export interface BannerOverlay {
+  id: string;
+  kind: "banner";
+  text: string;
+}
+export interface OnAirOverlay {
+  id: string;
+  kind: "onair";
+}
+export interface LogoOverlay {
+  id: string;
+  kind: "logo";
+  dataUrl: string;
+  position: "tl" | "tr" | "bl" | "br";
+}
+
+export type Overlay =
+  LowerThirdOverlay | BannerOverlay | OnAirOverlay | LogoOverlay;
 
 interface PeerInfo {
   socketId: string;
@@ -44,8 +83,6 @@ interface ConsumerEntry {
   source: Source;
 }
 
-// Three simulcast layers: the SFU forwards the best one each receiver's
-// network can handle.
 const CAM_ENCODINGS: mc.RtpEncodingParameters[] = [
   {
     rid: "r0",
@@ -90,8 +127,17 @@ export function useStudioCall({
   const [layout, setLayout] = useState<Layout>("grid");
   const [localScreen, setLocalScreen] = useState<MediaStream | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [spotlight, setSpotlight] = useState<string | null>(null);
+  const [raisedHands, setRaisedHands] = useState<Set<string>>(new Set());
+  const [overlays, setOverlaysState] = useState<Overlay[]>([]);
+  const [reactions, setReactions] = useState<Reaction[]>([]);
+  // Local mic / cam enabled state — toggled by the user or forced off by host
+  const [micEnabled, setMicEnabled] = useState(true);
+  const [camEnabled, setCamEnabled] = useState(true);
 
   const sendTransportRef = useRef<mc.Transport | null>(null);
+  const micProducerRef = useRef<mc.Producer | null>(null);
+  const camProducerRef = useRef<mc.Producer | null>(null);
   const screenRef = useRef<{
     producer: mc.Producer;
     track: MediaStreamTrack;
@@ -100,6 +146,25 @@ export function useStudioCall({
   useEffect(() => {
     onRemovedRef.current = onRemoved;
   });
+
+  // ── Self-toggle mic ────────────────────────────────────────────────────────
+  const toggleMic = useCallback(() => {
+    const enabled = !micEnabled;
+    localStream.getAudioTracks().forEach((t) => (t.enabled = enabled));
+    // Pause / resume at the SFU so bandwidth isn't wasted while muted.
+    const producer = micProducerRef.current;
+    if (producer) enabled ? void producer.resume() : void producer.pause();
+    setMicEnabled(enabled);
+  }, [micEnabled, localStream]);
+
+  // ── Self-toggle cam ────────────────────────────────────────────────────────
+  const toggleCam = useCallback(() => {
+    const enabled = !camEnabled;
+    localStream.getVideoTracks().forEach((t) => (t.enabled = enabled));
+    const producer = camProducerRef.current;
+    if (producer) enabled ? void producer.resume() : void producer.pause();
+    setCamEnabled(enabled);
+  }, [camEnabled, localStream]);
 
   // ── connect, produce, consume ──────────────────────────────────────────────
   useEffect(() => {
@@ -115,8 +180,6 @@ export function useStudioCall({
     const pending: ProducerInfo[] = [];
     const streamCache = new Map<string, { sig: string; stream: MediaStream }>();
 
-    // Keep MediaStream identity stable unless the track set really changed,
-    // otherwise <video> elements would restart on every update.
     const streamFor = (key: string, tracks: MediaStreamTrack[]) => {
       if (!tracks.length) {
         streamCache.delete(key);
@@ -140,8 +203,13 @@ export function useStudioCall({
         const entries = [...consumers.values()].filter(
           (c) => c.socketId === info.socketId,
         );
+        // audioMuted: no audio consumer → peer's mic is off
+        const hasAudio = entries.some(
+          (e) => e.source !== "screen" && e.consumer.kind === "audio",
+        );
         next[info.socketId] = {
           ...info,
+          audioMuted: !hasAudio,
           stream: streamFor(
             `${info.socketId}:cam`,
             entries
@@ -180,7 +248,6 @@ export function useStudioCall({
           .then(() => callback())
           .catch(errback);
       });
-
       if (direction === "send") {
         transport.on(
           "produce",
@@ -227,7 +294,6 @@ export function useStudioCall({
           consumer.close();
           return;
         }
-        // Producer may have been closed while we were setting up.
         if (!consumedProducers.has(info.producerId)) {
           consumer.close();
           return;
@@ -252,7 +318,7 @@ export function useStudioCall({
       }
     };
 
-    // ── socket events ────────────────────────────────────────────────────────
+    // ── socket events ──────────────────────────────────────────────────────
     const onPeerJoined = (p: PeerInfo) => {
       infos.set(p.socketId, p);
       publish();
@@ -293,10 +359,51 @@ export function useStudioCall({
 
     const onLayout = ({ layout }: { layout: Layout }) => setLayout(layout);
 
-    const onMuted = () =>
+    const onMuted = () => {
       localStream.getAudioTracks().forEach((t) => (t.enabled = false));
+      setMicEnabled(false); // reflect host-mute in local toggle button
+    };
+
+    const onCamStopped = ({ targetSocketId }: { targetSocketId: string }) => {
+      if (targetSocketId === socket.id) {
+        localStream.getVideoTracks().forEach((t) => (t.enabled = false));
+        setCamEnabled(false);
+      }
+    };
 
     const onKicked = () => onRemovedRef.current?.();
+    const onSpotlight = ({ socketId }: { socketId: string | null }) =>
+      setSpotlight(socketId);
+    const onOverlays = ({ overlays }: { overlays: Overlay[] }) =>
+      setOverlaysState(overlays);
+
+    const onRaiseHand = ({ socketId }: { socketId: string }) =>
+      setRaisedHands((prev) => new Set(prev).add(socketId));
+    const onLowerHand = ({ socketId }: { socketId: string }) =>
+      setRaisedHands((prev) => {
+        const n = new Set(prev);
+        n.delete(socketId);
+        return n;
+      });
+
+    // Emoji reactions — visible for 4 s then removed.
+    const onReaction = ({
+      socketId,
+      name: senderName,
+      emoji,
+    }: {
+      socketId: string;
+      name: string;
+      emoji: string;
+    }) => {
+      const id = `${socketId}-${Date.now()}`;
+      const r: Reaction = { id, socketId, name: senderName, emoji };
+      setReactions((prev) => [...prev, r]);
+      setTimeout(
+        () => setReactions((prev) => prev.filter((x) => x.id !== id)),
+        4000,
+      );
+    };
 
     socket.on("peer:joined", onPeerJoined);
     socket.on("peer:left", onPeerLeft);
@@ -305,7 +412,13 @@ export function useStudioCall({
     socket.on("chat:message", onChat);
     socket.on("host:layout", onLayout);
     socket.on("host:muted", onMuted);
+    socket.on("host:camStopped", onCamStopped);
     socket.on("host:removed", onKicked);
+    socket.on("host:spotlight", onSpotlight);
+    socket.on("host:overlays", onOverlays);
+    socket.on("peer:raiseHand", onRaiseHand);
+    socket.on("peer:lowerHand", onLowerHand);
+    socket.on("peer:reaction", onReaction);
 
     (async () => {
       try {
@@ -330,26 +443,25 @@ export function useStudioCall({
         if (cancelled) return recvTransport.close();
         sendTransportRef.current = sendTransport;
 
-        // Publish the camera / mic that the green room already opened.
-        // stopTracks:false → closing the producer must NOT stop the track,
-        // the recorder and green room still use it.
         const audio = localStream.getAudioTracks()[0];
         const video = localStream.getVideoTracks()[0];
         if (audio) {
-          await sendTransport.produce({
+          const micProd = await sendTransport.produce({
             track: audio,
             stopTracks: false,
             appData: { source: "mic" },
           });
+          micProducerRef.current = micProd;
         }
         if (video) {
-          await sendTransport.produce({
+          const camProd = await sendTransport.produce({
             track: video,
             stopTracks: false,
             encodings: CAM_ENCODINGS,
             codecOptions: { videoGoogleStartBitrate: 1000 },
             appData: { source: "cam" },
           });
+          camProducerRef.current = camProd;
         }
         if (cancelled) return;
 
@@ -374,18 +486,26 @@ export function useStudioCall({
       socket.off("chat:message", onChat);
       socket.off("host:layout", onLayout);
       socket.off("host:muted", onMuted);
+      socket.off("host:camStopped", onCamStopped);
       socket.off("host:removed", onKicked);
+      socket.off("host:spotlight", onSpotlight);
+      socket.off("host:overlays", onOverlays);
+      socket.off("peer:raiseHand", onRaiseHand);
+      socket.off("peer:lowerHand", onLowerHand);
+      socket.off("peer:reaction", onReaction);
 
       screenRef.current?.track.stop();
       screenRef.current = null;
       setLocalScreen(null);
+      micProducerRef.current = null;
+      camProducerRef.current = null;
 
       sendTransport?.close();
       recvTransport?.close();
       sendTransportRef.current = null;
       setPeers({});
     };
-  }, [socket, sessionId, localStream, name]);
+  }, [socket, sessionId, localStream, name]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── screen share ───────────────────────────────────────────────────────────
   const stopScreen = useCallback(() => {
@@ -414,12 +534,18 @@ export function useStudioCall({
         appData: { source: "screen" },
       });
       screenRef.current = { producer, track };
-      track.onended = () => stopScreen(); // browser "Stop sharing" bar
+      track.onended = () => stopScreen();
       setLocalScreen(new MediaStream([track]));
-    } catch (err) {
-      console.warn("[studio] screen share cancelled", err);
+    } catch {
+      /* user cancelled */
     }
   }, [stopScreen]);
+
+  // ── send reaction ──────────────────────────────────────────────────────────
+  const sendReaction = useCallback(
+    (emoji: string) => socket.emit("peer:sendReaction", { emoji }),
+    [socket],
+  );
 
   // ── chat + host controls ───────────────────────────────────────────────────
   const sendChat = useCallback(
@@ -431,13 +557,27 @@ export function useStudioCall({
     [socket],
   );
   const muteTarget = useCallback(
-    (targetSocketId: string) => socket.emit("host:mute", { targetSocketId }),
+    (id: string) => socket.emit("host:mute", { targetSocketId: id }),
     [socket],
   );
   const removeTarget = useCallback(
-    (targetSocketId: string) => socket.emit("host:remove", { targetSocketId }),
+    (id: string) => socket.emit("host:remove", { targetSocketId: id }),
     [socket],
   );
+  const stopCamTarget = useCallback(
+    (id: string) => socket.emit("host:stopCam", { targetSocketId: id }),
+    [socket],
+  );
+  const setSpotlightTarget = useCallback(
+    (id: string | null) => socket.emit("host:spotlight", { socketId: id }),
+    [socket],
+  );
+  const setOverlays = useCallback(
+    (ovs: Overlay[]) => socket.emit("host:overlays", { overlays: ovs }),
+    [socket],
+  );
+  const raiseHand = useCallback(() => socket.emit("peer:raiseHand"), [socket]);
+  const lowerHand = useCallback(() => socket.emit("peer:lowerHand"), [socket]);
 
   return {
     peers,
@@ -445,11 +585,25 @@ export function useStudioCall({
     layout,
     localScreen,
     screensharing: localScreen !== null,
+    spotlight,
+    raisedHands,
+    overlays,
+    reactions,
     error,
+    micEnabled,
+    camEnabled,
+    toggleMic,
+    toggleCam,
     shareScreen,
+    sendReaction,
     sendChat,
     setHostLayout,
     muteTarget,
     removeTarget,
+    stopCamTarget,
+    setSpotlightTarget,
+    setOverlays,
+    raiseHand,
+    lowerHand,
   };
 }

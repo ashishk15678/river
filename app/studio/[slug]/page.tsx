@@ -20,9 +20,9 @@ function CopyButton({ text, label }: { text: string; label: string }) {
   return (
     <button
       onClick={copy}
-      className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium bg-brand-subtle text-brand hover:bg-blue-100 shrink-0"
+      className="shrink-0 rounded-md border border-white/[0.1] bg-white/[0.04] px-2.5 py-1 text-xs font-medium text-zinc-300 transition hover:bg-white/[0.08] hover:text-white"
     >
-      {copied ? "✓ Copied!" : label}
+      {copied ? "✓ Copied" : label}
     </button>
   );
 }
@@ -77,15 +77,21 @@ function GreenRoom({
   }, []);
 
   return (
-    <main className="flex-1 flex flex-col items-center justify-center gap-6 px-6 py-10">
-      <h1 className="text-2xl font-semibold">{studioName}</h1>
-      <p className="text-slate-500 text-sm">
-        Check your camera and mic before joining
-      </p>
+    <main className="flex-1 flex flex-col items-center justify-center gap-6 px-6 py-12 bg-[#09090b]">
+      <div className="text-center">
+        <p className="mb-1 text-xs font-medium uppercase tracking-widest text-zinc-500">
+          Green room
+        </p>
+        <h1 className="text-2xl font-bold text-white">{studioName}</h1>
+        <p className="mt-1 text-sm text-zinc-400">
+          Check your camera and mic, then join when ready
+        </p>
+      </div>
 
-      <div className="w-full max-w-sm aspect-video bg-slate-900 rounded-lg overflow-hidden">
+      {/* Camera preview */}
+      <div className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-zinc-900 aspect-video ring-1 ring-white/[0.07]">
         {camErr ? (
-          <div className="w-full h-full flex items-center justify-center text-red-400 text-sm px-4 text-center">
+          <div className="flex h-full w-full items-center justify-center p-6 text-center text-sm text-red-400">
             {camErr}
           </div>
         ) : (
@@ -93,8 +99,17 @@ function GreenRoom({
             ref={videoRef}
             muted
             playsInline
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover"
           />
+        )}
+        {/* camera indicator dot */}
+        {!camErr && (
+          <div className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 text-xs text-zinc-300 backdrop-blur-sm">
+            <span
+              className={`size-1.5 rounded-full ${stream ? "bg-green-400" : "bg-yellow-400 animate-pulse"}`}
+            />
+            {stream ? "Camera ready" : "Starting…"}
+          </div>
         )}
       </div>
 
@@ -103,24 +118,24 @@ function GreenRoom({
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Your name"
-          className="w-full border border-brand-subtle rounded-md px-3 py-2 text-sm"
+          className="h-10 w-full rounded-lg border border-white/[0.1] bg-white/[0.03] px-3 text-sm text-white placeholder:text-zinc-500 focus:border-blue-500/60 focus:outline-none"
         />
         <button
           onClick={() => {
             if (stream && name.trim()) onJoin(name.trim(), stream);
           }}
           disabled={!stream || !name.trim()}
-          className="w-full bg-brand text-white rounded-md py-2 text-sm font-medium hover:bg-brand-light disabled:opacity-50"
+          className="h-10 w-full rounded-lg bg-blue-600 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:opacity-50"
         >
           {stream ? "Join studio" : "Waiting for camera…"}
         </button>
 
         {/* Invite link */}
-        <div className="flex items-center gap-2 rounded-md border border-brand-subtle bg-brand-subtle/40 px-3 py-2">
-          <span className="flex-1 text-xs text-slate-500 truncate">
+        <div className="flex items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.02] px-3 py-2">
+          <span className="flex-1 truncate text-xs text-zinc-500">
             {inviteUrl}
           </span>
-          <CopyButton text={inviteUrl} label="Copy invite link" />
+          <CopyButton text={inviteUrl} label="Copy invite" />
         </div>
       </div>
     </main>
@@ -151,6 +166,19 @@ function LiveStudio({
   const socket = useSocket(userId);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [chatInput, setChatInput] = useState("");
+  const [activePanel, setActivePanel] = useState<
+    "participants" | "chat" | "overlays"
+  >("chat");
+  // Local overlay editor state (host only) — synced to room via setOverlays
+  const [localOverlays, setLocalOverlays] = useState<
+    import("@/hooks/use-studio-call").Overlay[]
+  >([]);
+  const [newLtTitle, setNewLtTitle] = useState("");
+  const [newLtSub, setNewLtSub] = useState("");
+  const [newLtTarget, setNewLtTarget] = useState("local");
+  const [bannerText, setBannerText] = useState("");
+  const [logoPos, setLogoPos] = useState<"tl" | "tr" | "bl" | "br">("br");
+
   const {
     recording,
     start: startRec,
@@ -162,22 +190,43 @@ function LiveStudio({
     peers,
     messages,
     layout,
+    localScreen,
     screensharing,
+    spotlight,
+    raisedHands,
+    overlays,
     shareScreen,
     sendChat,
     setHostLayout,
     muteTarget,
     removeTarget,
+    stopCamTarget,
+    setSpotlightTarget,
+    setOverlays,
+    raiseHand,
+    lowerHand,
   } = useStudioCall({
     socket,
     sessionId,
     localStream,
     name: displayName,
-    userId,
-    isHost,
+    onRemoved: onEnd,
   });
 
   const endSession = trpc.session.end.useMutation({ onSuccess: onEnd });
+
+  // Keep local overlay state in sync with what the room sees
+  useEffect(() => {
+    setLocalOverlays(overlays);
+  }, [overlays]);
+
+  const pushOverlays = useCallback(
+    (next: import("@/hooks/use-studio-call").Overlay[]) => {
+      setLocalOverlays(next);
+      setOverlays(next);
+    },
+    [setOverlays],
+  );
 
   const handleRecord = useCallback(async () => {
     if (recording) {
@@ -188,31 +237,89 @@ function LiveStudio({
     }
   }, [recording, startRec, stopRec, download, localStream]);
 
+  const addOverlay = useCallback(
+    (ov: import("@/hooks/use-studio-call").Overlay) => {
+      pushOverlays([
+        ...localOverlays.filter((o) => o.kind !== ov.kind || o.id !== ov.id),
+        ov,
+      ]);
+    },
+    [localOverlays, pushOverlays],
+  );
+
+  const removeOverlay = useCallback(
+    (id: string) => {
+      pushOverlays(localOverlays.filter((o) => o.id !== id));
+    },
+    [localOverlays, pushOverlays],
+  );
+
+  const toggleOnAir = useCallback(() => {
+    const has = localOverlays.some((o) => o.kind === "onair");
+    if (has) pushOverlays(localOverlays.filter((o) => o.kind !== "onair"));
+    else pushOverlays([...localOverlays, { id: "onair", kind: "onair" }]);
+  }, [localOverlays, pushOverlays]);
+
+  const handleLogo = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = reader.result as string;
+        pushOverlays([
+          ...localOverlays.filter((o) => o.kind !== "logo"),
+          { id: "logo", kind: "logo", dataUrl, position: logoPos },
+        ]);
+      };
+      reader.readAsDataURL(file);
+    },
+    [localOverlays, pushOverlays, logoPos],
+  );
+
   const inviteUrl =
     typeof window !== "undefined"
       ? `${window.location.origin}/studio/${studioSlug}`
       : "";
 
+  const hasOnAir = localOverlays.some((o) => o.kind === "onair");
+  const hasBanner = localOverlays.some((o) => o.kind === "banner");
+  const hasLogo = localOverlays.some((o) => o.kind === "logo");
+  const myRaisedHand = raisedHands.has(socket.id ?? "");
+
+  const allParticipants = [
+    { socketId: "local", name: `${displayName} (you)`, isHost, isLocal: true },
+    ...Object.values(peers).map((p) => ({ ...p, isLocal: false })),
+  ];
+
   return (
-    <div className="flex-1 flex flex-col min-h-0">
-      <header className="border-b border-brand-subtle px-4 py-2 flex items-center gap-2 shrink-0 flex-wrap">
-        <span className="font-semibold text-brand truncate mr-1">
+    <div className="flex-1 flex flex-col min-h-0 bg-[#09090b]">
+      {/* ── top bar ─────────────────────────────────────────────────────── */}
+      <header className="border-b border-white/[0.07] px-3 h-11 flex items-center gap-2 shrink-0">
+        <span className="font-semibold text-white truncate mr-1 text-sm">
           {studioName}
         </span>
+
+        {hasOnAir && (
+          <span className="flex items-center gap-1.5 rounded-full bg-red-600 px-2.5 py-0.5 text-[11px] font-bold text-white">
+            <span className="size-1.5 rounded-full bg-white animate-pulse" />
+            ON AIR
+          </span>
+        )}
 
         <CopyButton text={inviteUrl} label="Invite" />
 
         {/* Layout switcher — host only */}
         {isHost && (
-          <div className="flex gap-1 ml-1">
+          <div className="flex gap-1">
             {(["grid", "spotlight", "solo"] as const).map((l) => (
               <button
                 key={l}
                 onClick={() => setHostLayout(l)}
-                className={`px-2 py-1 rounded text-xs font-medium ${
+                className={`px-2 py-1 rounded text-[11px] font-medium transition ${
                   layout === l
-                    ? "bg-brand text-white"
-                    : "bg-brand-subtle text-brand hover:bg-blue-100"
+                    ? "bg-blue-600 text-white"
+                    : "text-zinc-400 hover:bg-white/[0.06] hover:text-white"
                 }`}
               >
                 {l}
@@ -221,47 +328,57 @@ function LiveStudio({
           </div>
         )}
 
-        {/* Right-side controls */}
-        <div className="flex gap-2 ml-auto flex-wrap">
+        <div className="flex gap-1.5 ml-auto flex-wrap">
+          {!isHost && (
+            <button
+              onClick={myRaisedHand ? lowerHand : raiseHand}
+              className={`px-2.5 py-1 rounded text-[11px] font-medium transition ${
+                myRaisedHand
+                  ? "bg-yellow-500/20 text-yellow-300"
+                  : "text-zinc-400 hover:bg-white/[0.06] hover:text-white"
+              }`}
+            >
+              {myRaisedHand ? "✋ Lower hand" : "✋ Raise hand"}
+            </button>
+          )}
+
           <button
             onClick={shareScreen}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium ${
+            className={`px-2.5 py-1 rounded text-[11px] font-medium transition ${
               screensharing
-                ? "bg-brand text-white hover:bg-brand-light"
-                : "bg-brand-subtle text-brand hover:bg-blue-100"
+                ? "bg-blue-600 text-white"
+                : "text-zinc-400 hover:bg-white/[0.06] hover:text-white"
             }`}
           >
             {screensharing ? "Stop sharing" : "Share screen"}
           </button>
 
-          {/* Record */}
           <button
             onClick={handleRecord}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium ${
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-medium transition ${
               recording
-                ? "bg-red-600 text-white hover:bg-red-700"
-                : "bg-brand-subtle text-brand hover:bg-blue-100"
+                ? "bg-red-600 text-white hover:bg-red-500"
+                : "text-zinc-400 hover:bg-white/[0.06] hover:text-white"
             }`}
           >
             <span
-              className={`w-2 h-2 rounded-full ${recording ? "bg-white" : "bg-red-600"}`}
+              className={`size-1.5 rounded-full ${recording ? "bg-white animate-pulse" : "bg-red-500"}`}
             />
-            {recording ? "Stop · download" : "Record"}
+            {recording ? "Stop · Save" : "Record"}
           </button>
 
           {isHost && (
             <button
               onClick={() => endSession.mutate({ sessionId })}
-              className="px-3 py-1.5 rounded text-xs font-medium bg-red-50 text-red-600 hover:bg-red-100"
+              className="px-2.5 py-1 rounded text-[11px] font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition"
             >
               End session
             </button>
           )}
-
           {!isHost && (
             <button
               onClick={onEnd}
-              className="px-3 py-1.5 rounded text-xs font-medium text-slate-500 hover:text-slate-800"
+              className="px-2.5 py-1 rounded text-[11px] font-medium text-zinc-500 hover:text-zinc-200 transition"
             >
               Leave
             </button>
@@ -271,95 +388,327 @@ function LiveStudio({
 
       <div className="flex flex-1 min-h-0">
         {/* ── canvas ──────────────────────────────────────────────────────── */}
-        <div className="flex-1 bg-slate-900 relative">
-          <canvas ref={canvasRef} className="w-full h-full object-contain" />
+        <div className="flex-1 bg-zinc-950 relative min-w-0">
           <StudioCanvas
             ref={canvasRef}
             localStream={localStream}
+            localScreen={localScreen}
             localName={displayName}
             peers={peers}
             layout={layout}
+            spotlight={spotlight}
+            raisedHands={raisedHands}
+            overlays={localOverlays}
+            className="w-full h-full object-contain"
           />
         </div>
 
         {/* ── sidebar ─────────────────────────────────────────────────────── */}
-        <aside className="w-64 border-l border-brand-subtle flex flex-col shrink-0">
-          {/* Participants */}
-          <div className="border-b border-brand-subtle px-3 py-2">
-            <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">
-              In studio ({Object.keys(peers).length + 1})
-            </p>
-            <ul className="space-y-1">
-              <li className="text-sm">
-                {displayName}{" "}
-                <span className="text-xs text-slate-400">(you)</span>
-              </li>
-              {Object.values(peers).map((p) => (
-                <li
-                  key={p.socketId}
-                  className="flex items-center justify-between text-sm"
-                >
-                  <span>
-                    {p.name}
-                    {p.isHost && (
-                      <span className="ml-1 text-xs text-brand">host</span>
-                    )}
-                  </span>
-                  {isHost && (
-                    <span className="flex gap-1">
-                      <button
-                        onClick={() => muteTarget(p.socketId)}
-                        className="text-xs text-slate-400 hover:text-slate-700"
-                      >
-                        mute
-                      </button>
-                      <button
-                        onClick={() => removeTarget(p.socketId)}
-                        className="text-xs text-red-400 hover:text-red-600"
-                      >
-                        remove
-                      </button>
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Chat messages */}
-          <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2 min-h-0">
-            {messages.map((m) => (
-              <div key={m.id} className="text-sm">
-                <span className="font-medium text-brand">{m.senderName}: </span>
-                <span className="text-slate-700">{m.body}</span>
-              </div>
+        <aside className="w-[260px] border-l border-white/[0.07] flex flex-col shrink-0 bg-[#0c0c0e]">
+          {/* Panel tabs */}
+          <div className="flex border-b border-white/[0.07] shrink-0">
+            {(
+              ["participants", "chat", ...(isHost ? ["overlays"] : [])] as const
+            ).map((p) => (
+              <button
+                key={p}
+                onClick={() => setActivePanel(p as typeof activePanel)}
+                className={`flex-1 py-2.5 text-[11px] font-medium capitalize transition ${
+                  activePanel === p
+                    ? "border-b-2 border-blue-500 text-blue-400"
+                    : "text-zinc-500 hover:text-zinc-200"
+                }`}
+              >
+                {p}
+              </button>
             ))}
           </div>
 
-          {/* Chat input */}
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (chatInput.trim()) {
-                sendChat(chatInput.trim());
-                setChatInput("");
-              }
-            }}
-            className="border-t border-brand-subtle px-2 py-2 flex gap-1"
-          >
-            <input
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              placeholder="Message…"
-              className="flex-1 border border-brand-subtle rounded px-2 py-1 text-sm"
-            />
-            <button
-              type="submit"
-              className="px-2 py-1 rounded bg-brand text-white text-sm hover:bg-brand-light"
-            >
-              →
-            </button>
-          </form>
+          {/* ── Participants panel ─────────────────────────────────────── */}
+          {activePanel === "participants" && (
+            <div className="flex-1 overflow-y-auto">
+              <p className="px-3 py-2 text-[11px] font-medium uppercase tracking-wider text-zinc-600">
+                In studio · {allParticipants.length}
+              </p>
+              <ul className="space-y-px px-2 pb-2">
+                {allParticipants.map((p) => (
+                  <li
+                    key={p.socketId}
+                    className="rounded-lg px-2 py-2 hover:bg-white/[0.03]"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-white/[0.06] text-[11px] font-semibold text-zinc-300">
+                        {(p.name[0] ?? "?").toUpperCase()}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[13px] text-zinc-200">
+                          {p.name}
+                          {p.isHost && (
+                            <span className="ml-1.5 text-[10px] text-blue-400">
+                              host
+                            </span>
+                          )}
+                        </p>
+                        {raisedHands.has(p.socketId) && (
+                          <p className="text-[10px] text-yellow-400">
+                            ✋ raised hand
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    {isHost && !p.isLocal && (
+                      <div className="mt-1.5 flex gap-1 pl-9">
+                        <button
+                          onClick={() => muteTarget(p.socketId)}
+                          className="rounded px-2 py-0.5 text-[10px] text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200"
+                        >
+                          Mute
+                        </button>
+                        <button
+                          onClick={() => stopCamTarget(p.socketId)}
+                          className="rounded px-2 py-0.5 text-[10px] text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200"
+                        >
+                          Cam off
+                        </button>
+                        <button
+                          onClick={() =>
+                            setSpotlightTarget(
+                              spotlight === p.socketId ? null : p.socketId,
+                            )
+                          }
+                          className={`rounded px-2 py-0.5 text-[10px] ${
+                            spotlight === p.socketId
+                              ? "bg-yellow-500/20 text-yellow-300"
+                              : "text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200"
+                          }`}
+                        >
+                          {spotlight === p.socketId ? "★ Spotlit" : "Spotlight"}
+                        </button>
+                        <button
+                          onClick={() => removeTarget(p.socketId)}
+                          className="rounded px-2 py-0.5 text-[10px] text-red-500 hover:bg-red-500/10 hover:text-red-400"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* ── Chat panel ────────────────────────────────────────────── */}
+          {activePanel === "chat" && (
+            <>
+              <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2 min-h-0">
+                {messages.length === 0 && (
+                  <p className="mt-6 text-center text-xs text-zinc-600">
+                    No messages yet
+                  </p>
+                )}
+                {messages.map((m) => (
+                  <div key={m.id} className="text-sm leading-snug">
+                    <span className="font-semibold text-blue-400">
+                      {m.senderName}{" "}
+                    </span>
+                    <span className="text-zinc-300">{m.body}</span>
+                  </div>
+                ))}
+              </div>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (chatInput.trim()) {
+                    sendChat(chatInput.trim());
+                    setChatInput("");
+                  }
+                }}
+                className="border-t border-white/[0.07] px-2 py-2 flex gap-1.5 shrink-0"
+              >
+                <input
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  placeholder="Message…"
+                  className="h-8 flex-1 rounded-lg border border-white/[0.1] bg-white/[0.03] px-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-blue-500/60 focus:outline-none"
+                />
+                <button
+                  type="submit"
+                  className="h-8 w-8 flex items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-500 text-sm"
+                >
+                  →
+                </button>
+              </form>
+            </>
+          )}
+
+          {/* ── Overlays panel (host only) ─────────────────────────── */}
+          {activePanel === "overlays" && isHost && (
+            <div className="flex-1 overflow-y-auto px-3 py-3 space-y-4">
+              <section>
+                <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
+                  On Air
+                </p>
+                <button
+                  onClick={toggleOnAir}
+                  className={`w-full rounded-lg py-2 text-xs font-medium transition ${
+                    hasOnAir
+                      ? "bg-red-600 text-white hover:bg-red-500"
+                      : "border border-white/[0.1] bg-white/[0.02] text-zinc-300 hover:bg-white/[0.05]"
+                  }`}
+                >
+                  {hasOnAir ? "● Remove On Air" : "Add On Air indicator"}
+                </button>
+              </section>
+
+              <section>
+                <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
+                  Lower thirds
+                </p>
+                <div className="space-y-1.5">
+                  <select
+                    value={newLtTarget}
+                    onChange={(e) => setNewLtTarget(e.target.value)}
+                    className="h-8 w-full rounded-lg border border-white/[0.1] bg-white/[0.03] px-2 text-xs text-zinc-200 focus:outline-none"
+                  >
+                    <option value="local">{displayName} (you)</option>
+                    {Object.values(peers).map((p) => (
+                      <option key={p.socketId} value={p.socketId}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    value={newLtTitle}
+                    onChange={(e) => setNewLtTitle(e.target.value)}
+                    placeholder="Name / title"
+                    className="h-8 w-full rounded-lg border border-white/[0.1] bg-white/[0.03] px-2.5 text-xs text-zinc-200 placeholder:text-zinc-600 focus:outline-none"
+                  />
+                  <input
+                    value={newLtSub}
+                    onChange={(e) => setNewLtSub(e.target.value)}
+                    placeholder="Role / company"
+                    className="h-8 w-full rounded-lg border border-white/[0.1] bg-white/[0.03] px-2.5 text-xs text-zinc-200 placeholder:text-zinc-600 focus:outline-none"
+                  />
+                  <button
+                    disabled={!newLtTitle.trim()}
+                    onClick={() => {
+                      const id = `lt-${newLtTarget}`;
+                      addOverlay({
+                        id,
+                        kind: "lower-third",
+                        socketId: newLtTarget,
+                        title: newLtTitle.trim(),
+                        subtitle: newLtSub.trim(),
+                      });
+                      setNewLtTitle("");
+                      setNewLtSub("");
+                    }}
+                    className="h-8 w-full rounded-lg bg-blue-600 text-xs font-medium text-white hover:bg-blue-500 disabled:opacity-50"
+                  >
+                    Add lower third
+                  </button>
+                  {localOverlays
+                    .filter((o) => o.kind === "lower-third")
+                    .map((o) => {
+                      if (o.kind !== "lower-third") return null;
+                      return (
+                        <div
+                          key={o.id}
+                          className="flex items-center justify-between rounded-lg border border-white/[0.08] bg-white/[0.02] px-2.5 py-1.5"
+                        >
+                          <span className="truncate text-xs text-zinc-300">
+                            {o.title}
+                          </span>
+                          <button
+                            onClick={() => removeOverlay(o.id)}
+                            className="ml-2 shrink-0 text-zinc-500 hover:text-red-400 text-xs"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      );
+                    })}
+                </div>
+              </section>
+
+              {/* Banner ticker */}
+              <section>
+                <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
+                  Banner text
+                </p>
+                <div className="space-y-1.5">
+                  <input
+                    value={bannerText}
+                    onChange={(e) => setBannerText(e.target.value)}
+                    placeholder="Breaking: your text here…"
+                    className="h-8 w-full rounded-lg border border-white/[0.1] bg-white/[0.03] px-2.5 text-xs text-zinc-200 placeholder:text-zinc-600 focus:outline-none"
+                  />
+                  <div className="flex gap-1.5">
+                    <button
+                      disabled={!bannerText.trim()}
+                      onClick={() =>
+                        addOverlay({
+                          id: "banner",
+                          kind: "banner",
+                          text: bannerText.trim(),
+                        })
+                      }
+                      className="h-8 flex-1 rounded-lg bg-blue-600 text-xs font-medium text-white hover:bg-blue-500 disabled:opacity-50"
+                    >
+                      {hasBanner ? "Update" : "Add"} banner
+                    </button>
+                    {hasBanner && (
+                      <button
+                        onClick={() => removeOverlay("banner")}
+                        className="h-8 rounded-lg border border-red-500/20 bg-red-500/10 px-3 text-xs text-red-400 hover:bg-red-500/15"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </section>
+
+              {/* Logo watermark */}
+              <section>
+                <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
+                  Logo watermark
+                </p>
+                <div className="space-y-1.5">
+                  <select
+                    value={logoPos}
+                    onChange={(e) =>
+                      setLogoPos(e.target.value as typeof logoPos)
+                    }
+                    className="h-8 w-full rounded-lg border border-white/[0.1] bg-white/[0.03] px-2 text-xs text-zinc-200 focus:outline-none"
+                  >
+                    <option value="tl">Top left</option>
+                    <option value="tr">Top right</option>
+                    <option value="bl">Bottom left</option>
+                    <option value="br">Bottom right</option>
+                  </select>
+                  <label className="flex h-8 w-full cursor-pointer items-center justify-center rounded-lg border border-white/[0.1] bg-white/[0.02] text-xs font-medium text-zinc-300 hover:bg-white/[0.05]">
+                    {hasLogo ? "Replace logo" : "Upload logo (PNG/SVG)"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="sr-only"
+                      onChange={handleLogo}
+                    />
+                  </label>
+                  {hasLogo && (
+                    <button
+                      onClick={() => removeOverlay("logo")}
+                      className="h-8 w-full rounded-lg border border-red-500/20 bg-red-500/10 text-xs text-red-400 hover:bg-red-500/15"
+                    >
+                      Remove logo
+                    </button>
+                  )}
+                </div>
+              </section>
+            </div>
+          )}
         </aside>
       </div>
     </div>
@@ -436,7 +785,7 @@ export default function StudioPage({
 
   if (studio.error) {
     return (
-      <main className="flex-1 flex items-center justify-center text-slate-500">
+      <main className="flex-1 flex items-center justify-center bg-[#09090b] text-zinc-500 text-sm">
         Studio not found.
       </main>
     );
@@ -444,22 +793,56 @@ export default function StudioPage({
 
   if (phase.name === "loading" || studio.isPending) {
     return (
-      <main className="flex-1 flex items-center justify-center text-slate-400 text-sm">
-        Loading…
+      <main className="flex-1 flex items-center justify-center bg-[#09090b]">
+        <div className="flex items-center gap-3 text-zinc-500 text-sm">
+          <svg
+            className="size-4 animate-spin"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            aria-hidden
+          >
+            <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+          </svg>
+          Loading studio…
+        </div>
       </main>
     );
   }
 
   if (phase.name === "no_session") {
     return (
-      <main className="flex-1 flex flex-col items-center justify-center gap-4 text-slate-500">
-        <p>The host hasn&apos;t started the session yet.</p>
-        <button
-          onClick={() => setPhase({ name: "greenroom" })}
-          className="px-4 py-2 rounded bg-brand-subtle text-brand text-sm hover:bg-blue-100"
-        >
-          Try again
-        </button>
+      <main className="flex-1 flex flex-col items-center justify-center gap-4 bg-[#09090b]">
+        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-8 text-center max-w-xs">
+          <div className="mb-3 flex justify-center">
+            <div className="flex size-12 items-center justify-center rounded-full bg-zinc-800">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="size-6 text-zinc-400"
+                aria-hidden
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 8v4M12 16h.01" />
+              </svg>
+            </div>
+          </div>
+          <p className="text-sm font-medium text-white">Session not started</p>
+          <p className="mt-1 text-xs text-zinc-500">
+            The host hasn&apos;t gone live yet.
+          </p>
+          <button
+            onClick={() => setPhase({ name: "greenroom" })}
+            className="mt-4 w-full rounded-lg bg-blue-600 py-2 text-sm font-medium text-white hover:bg-blue-500"
+          >
+            Try again
+          </button>
+        </div>
       </main>
     );
   }

@@ -122,7 +122,6 @@ function Icon({
   );
 }
 
-// ─── Sidebar ─────────────────────────────────────────────────────────────────
 const NAV = [
   { label: "Dashboard", icon: "dashboard", active: true },
   { label: "Lifecycle", icon: "list" },
@@ -156,7 +155,7 @@ function Sidebar({
   return (
     <aside
       className={`shrink-0 overflow-hidden border-white/[0.07] bg-[#0c0c0e] transition-[width] duration-200 ${
-        open ? "w-[195px] border-r" : "w-0"
+        open ? "w-53 border-r" : "w-0"
       }`}
     >
       <div className="flex h-full w-[195px] flex-col px-2 py-2.5">
@@ -265,7 +264,7 @@ function StatCard({
   sub: string;
 }) {
   return (
-    <div className="rounded-xl border border-white/[0.08] bg-gradient-to-b from-white/[0.04] to-white/[0.01] p-5">
+    <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-5">
       <div className="flex items-start justify-between">
         <p className="text-[13px] text-zinc-400">{label}</p>
         <span className="flex items-center gap-1 rounded-md border border-white/[0.1] px-2 py-0.5 text-[10px] font-medium text-zinc-200">
@@ -317,12 +316,6 @@ function AreaChart({ points }: { points: { label: string; value: number }[] }) {
           preserveAspectRatio="none"
           className="absolute inset-0 size-full"
         >
-          <defs>
-            <linearGradient id="areaBlue" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#2563eb" stopOpacity="0.65" />
-              <stop offset="100%" stopColor="#1e3a8a" stopOpacity="0.05" />
-            </linearGradient>
-          </defs>
           {[0.25, 0.5, 0.75].map((f) => (
             <line
               key={f}
@@ -334,7 +327,7 @@ function AreaChart({ points }: { points: { label: string; value: number }[] }) {
               vectorEffect="non-scaling-stroke"
             />
           ))}
-          {area && <path d={area} fill="url(#areaBlue)" />}
+          {area && <path d={area} fill="rgba(37,99,235,0.12)" />}
           {line && (
             <path
               d={line}
@@ -474,7 +467,6 @@ function StudioRow({
   );
 }
 
-// ─── Page ────────────────────────────────────────────────────────────────────
 export default function DashboardPage() {
   const router = useRouter();
   const { data: session, isPending } = useSession();
@@ -483,7 +475,6 @@ export default function DashboardPage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const utils = trpc.useUtils();
 
-  // Redirect in an effect, not during render.
   useEffect(() => {
     if (!isPending && !session) router.push("/auth");
   }, [isPending, session, router]);
@@ -584,7 +575,7 @@ export default function DashboardPage() {
           </div>
 
           {/* chart */}
-          <section className="rounded-xl border border-white/[0.08] bg-gradient-to-b from-white/[0.03] to-transparent p-5">
+          <section className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-5">
             <h2 className="text-[14px] font-semibold text-white">
               Session activity
             </h2>
@@ -597,7 +588,7 @@ export default function DashboardPage() {
           {/* studios */}
           <section
             id="studios"
-            className="rounded-xl border border-white/[0.08] bg-gradient-to-b from-white/[0.03] to-transparent p-5"
+            className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-5"
           >
             <h2 className="text-[14px] font-semibold text-white">
               Your studios

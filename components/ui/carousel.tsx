@@ -44,9 +44,7 @@ function useCarousel() {
 }
 
 function Carousel({
-  // Derive default orientation from opts.axis when orientation is not
-  // explicitly supplied, so opts={{ axis: "y" }} isn't silently overridden.
-  orientation = opts?.axis === "y" ? "vertical" : "horizontal",
+  orientation,
   opts,
   setApi,
   plugins,
@@ -54,10 +52,14 @@ function Carousel({
   children,
   ...props
 }: React.ComponentProps<"div"> & CarouselProps) {
+  // Derive orientation from opts.axis when not explicitly supplied,
+  // so opts={{ axis: "y" }} isn't silently overridden to "horizontal".
+  const resolvedOrientation: "horizontal" | "vertical" =
+    orientation ?? (opts?.axis === "y" ? "vertical" : "horizontal");
   const [carouselRef, api] = useEmblaCarousel(
     {
       ...opts,
-      axis: orientation === "horizontal" ? "x" : "y",
+      axis: resolvedOrientation === "horizontal" ? "x" : "y",
     },
     plugins,
   );
@@ -86,8 +88,10 @@ function Carousel({
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || editable)
         return;
 
-      const prevKey = orientation === "vertical" ? "ArrowUp" : "ArrowLeft";
-      const nextKey = orientation === "vertical" ? "ArrowDown" : "ArrowRight";
+      const prevKey =
+        resolvedOrientation === "vertical" ? "ArrowUp" : "ArrowLeft";
+      const nextKey =
+        resolvedOrientation === "vertical" ? "ArrowDown" : "ArrowRight";
 
       if (event.key === prevKey) {
         event.preventDefault();
@@ -97,7 +101,7 @@ function Carousel({
         scrollNext();
       }
     },
-    [orientation, scrollPrev, scrollNext],
+    [resolvedOrientation, scrollPrev, scrollNext],
   );
 
   React.useEffect(() => {
@@ -123,7 +127,7 @@ function Carousel({
         carouselRef,
         api: api,
         opts,
-        orientation,
+        orientation: resolvedOrientation,
         scrollPrev,
         scrollNext,
         canScrollPrev,
