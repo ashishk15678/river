@@ -99,7 +99,13 @@ const ICONS: Record<string, ReactNode> = {
   ),
 };
 
-function Icon({ name, className = "size-4" }: { name: string; className?: string }) {
+function Icon({
+  name,
+  className = "size-4",
+}: {
+  name: string;
+  className?: string;
+}) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -222,7 +228,9 @@ function Sidebar({
             {(userName[0] ?? "?").toUpperCase()}
           </div>
           <div className="min-w-0 flex-1 leading-tight">
-            <p className="truncate text-[12px] font-medium text-white">{userName}</p>
+            <p className="truncate text-[12px] font-medium text-white">
+              {userName}
+            </p>
             <p className="truncate text-[11px] text-zinc-500">{userEmail}</p>
           </div>
           <button
@@ -363,7 +371,9 @@ function SessionHistory({ studioId }: { studioId: string }) {
   if (isPending)
     return <p className="px-4 py-3 text-xs text-zinc-500">Loading history…</p>;
   if (!data?.length)
-    return <p className="px-4 py-3 text-xs text-zinc-500">No past sessions yet.</p>;
+    return (
+      <p className="px-4 py-3 text-xs text-zinc-500">No past sessions yet.</p>
+    );
 
   return (
     <ul className="divide-y divide-white/[0.06]">
@@ -393,7 +403,9 @@ function SessionHistory({ studioId }: { studioId: string }) {
                 minute: "2-digit",
               })}
             </span>
-            <span className={`font-medium ${ended ? "text-zinc-500" : "text-blue-400"}`}>
+            <span
+              className={`font-medium ${ended ? "text-zinc-500" : "text-blue-400"}`}
+            >
               {ended ? dur : "● live"}
             </span>
           </li>
@@ -418,7 +430,9 @@ function StudioRow({
     <li className="overflow-hidden rounded-lg border border-white/[0.08] bg-white/[0.02]">
       <div className="flex items-center justify-between px-4 py-3">
         <div className="min-w-0">
-          <p className="truncate text-[14px] font-medium text-white">{studio.name}</p>
+          <p className="truncate text-[14px] font-medium text-white">
+            {studio.name}
+          </p>
           <p className="text-xs text-zinc-500">
             /{studio.slug} · {n} session{n === 1 ? "" : "s"}
           </p>
@@ -435,7 +449,8 @@ function StudioRow({
           )}
           <button
             onClick={() => {
-              if (window.confirm(`Delete "${studio.name}"?`)) onDelete(studio.id);
+              if (window.confirm(`Delete "${studio.name}"?`))
+                onDelete(studio.id);
             }}
             className="rounded px-2 py-1 text-xs text-red-400 hover:bg-red-500/10 hover:text-red-300"
           >
@@ -473,7 +488,9 @@ export default function DashboardPage() {
     if (!isPending && !session) router.push("/auth");
   }, [isPending, session, router]);
 
-  const studiosQuery = trpc.studio.list.useQuery(undefined, { enabled: !!session });
+  const studiosQuery = trpc.studio.list.useQuery(undefined, {
+    enabled: !!session,
+  });
   const create = trpc.studio.create.useMutation({
     onSuccess: () => {
       setName("");
@@ -484,11 +501,17 @@ export default function DashboardPage() {
     onSuccess: () => utils.studio.list.invalidate(),
   });
 
-  const studios = useMemo<Studio[]>(() => studiosQuery.data ?? [], [studiosQuery.data]);
+  const studios = useMemo<Studio[]>(
+    () => studiosQuery.data ?? [],
+    [studiosQuery.data],
+  );
   const totalSessions = studios.reduce((sum, s) => sum + s._count.sessions, 0);
   const active = studios.filter((s) => s._count.sessions > 0).length;
   const avg = studios.length ? totalSessions / studios.length : 0;
-  const points = studios.map((s) => ({ label: s.name, value: s._count.sessions }));
+  const points = studios.map((s) => ({
+    label: s.name,
+    value: s._count.sessions,
+  }));
 
   if (!isPending && !session) return null;
 
@@ -530,7 +553,9 @@ export default function DashboardPage() {
               value={String(studios.length)}
               badge="Studios"
               badgeIcon="up"
-              headline={studios.length ? "Ready to go live" : "Create your first studio"}
+              headline={
+                studios.length ? "Ready to go live" : "Create your first studio"
+              }
               headlineIcon="up"
               sub="Studios you own"
             />
@@ -539,7 +564,9 @@ export default function DashboardPage() {
               value={String(totalSessions)}
               badge="Sessions"
               badgeIcon="up"
-              headline={totalSessions ? "Sessions hosted so far" : "No sessions yet"}
+              headline={
+                totalSessions ? "Sessions hosted so far" : "No sessions yet"
+              }
               headlineIcon={totalSessions ? "up" : "down"}
               sub="Across all studios"
             />
@@ -548,7 +575,9 @@ export default function DashboardPage() {
               value={String(active)}
               badge={`${avg.toFixed(1)} avg`}
               badgeIcon={active ? "up" : "down"}
-              headline={active ? "Studios with sessions" : "Nothing recorded yet"}
+              headline={
+                active ? "Studios with sessions" : "Nothing recorded yet"
+              }
               headlineIcon={active ? "up" : "down"}
               sub="Average sessions per studio shown above"
             />
@@ -556,7 +585,9 @@ export default function DashboardPage() {
 
           {/* chart */}
           <section className="rounded-xl border border-white/[0.08] bg-gradient-to-b from-white/[0.03] to-transparent p-5">
-            <h2 className="text-[14px] font-semibold text-white">Session activity</h2>
+            <h2 className="text-[14px] font-semibold text-white">
+              Session activity
+            </h2>
             <p className="mb-5 mt-0.5 text-[12px] text-zinc-500">
               Sessions hosted per studio
             </p>
@@ -568,7 +599,9 @@ export default function DashboardPage() {
             id="studios"
             className="rounded-xl border border-white/[0.08] bg-gradient-to-b from-white/[0.03] to-transparent p-5"
           >
-            <h2 className="text-[14px] font-semibold text-white">Your studios</h2>
+            <h2 className="text-[14px] font-semibold text-white">
+              Your studios
+            </h2>
             <p className="mb-4 mt-0.5 text-[12px] text-zinc-500">
               Create, open and manage your recording studios
             </p>

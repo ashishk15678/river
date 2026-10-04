@@ -28,10 +28,12 @@ function tileRects(count: number, layout: Layout): Rect[] {
     const sideH = H / sideCount;
     return [
       [0, 0, mainW, H],
-      ...Array.from(
-        { length: sideCount },
-        (_, i): Rect => [mainW, i * sideH, W - mainW, sideH],
-      ),
+      ...Array.from({ length: sideCount }, (_, i): Rect => [
+        mainW,
+        i * sideH,
+        W - mainW,
+        sideH,
+      ]),
     ];
   }
 
@@ -39,10 +41,12 @@ function tileRects(count: number, layout: Layout): Rect[] {
   const rows = Math.ceil(count / cols);
   const cw = W / cols;
   const ch = H / rows;
-  return Array.from(
-    { length: count },
-    (_, i): Rect => [(i % cols) * cw, Math.floor(i / cols) * ch, cw, ch],
-  );
+  return Array.from({ length: count }, (_, i): Rect => [
+    (i % cols) * cw,
+    Math.floor(i / cols) * ch,
+    cw,
+    ch,
+  ]);
 }
 
 function drawVideo(
@@ -93,14 +97,36 @@ export const StudioCanvas = forwardRef<
   // Screens first so spotlight / solo show the shared screen.
   const tiles: Tile[] = [
     ...(localScreen
-      ? [{ key: "local:screen", stream: localScreen, label: `${localName} (screen)`, isLocal: true, isScreen: true }]
+      ? [
+          {
+            key: "local:screen",
+            stream: localScreen,
+            label: `${localName} (screen)`,
+            isLocal: true,
+            isScreen: true,
+          },
+        ]
       : []),
     ...Object.values(peers).flatMap((p) =>
       p.screen
-        ? [{ key: `${p.socketId}:screen`, stream: p.screen, label: `${p.name} (screen)`, isLocal: false, isScreen: true }]
+        ? [
+            {
+              key: `${p.socketId}:screen`,
+              stream: p.screen,
+              label: `${p.name} (screen)`,
+              isLocal: false,
+              isScreen: true,
+            },
+          ]
         : [],
     ),
-    { key: "local", stream: localStream, label: `${localName} (you)`, isLocal: true, isScreen: false },
+    {
+      key: "local",
+      stream: localStream,
+      label: `${localName} (you)`,
+      isLocal: true,
+      isScreen: false,
+    },
     ...Object.values(peers).map((p) => ({
       key: p.socketId,
       stream: p.stream,
@@ -112,7 +138,9 @@ export const StudioCanvas = forwardRef<
   tilesRef.current = tiles;
   layoutRef.current = layout;
 
-  const signature = tiles.map((t) => `${t.key}=${t.stream?.id ?? ""}`).join("|");
+  const signature = tiles
+    .map((t) => `${t.key}=${t.stream?.id ?? ""}`)
+    .join("|");
 
   // One off-DOM <video> per tile: gives the canvas decoded frames and plays
   // remote audio (remote videos are unmuted, local ones muted to avoid echo).
@@ -172,7 +200,12 @@ export const StudioCanvas = forwardRef<
       list.forEach((t, i) => {
         const r = rects[i];
         if (!r) return;
-        const rect: Rect = [r[0] + GAP / 2, r[1] + GAP / 2, r[2] - GAP, r[3] - GAP];
+        const rect: Rect = [
+          r[0] + GAP / 2,
+          r[1] + GAP / 2,
+          r[2] - GAP,
+          r[3] - GAP,
+        ];
         const [x, y, w, h] = rect;
 
         ctx.fillStyle = t.isScreen ? "#000000" : "#1e293b";

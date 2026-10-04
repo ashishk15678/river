@@ -109,7 +109,9 @@ export function attachSocketServer(httpServer: HTTPServer) {
         } catch (err) {
           console.error(`[socket] ${event} error`, err);
           if (typeof ack === "function") {
-            ack({ error: err instanceof Error ? err.message : "internal_error" });
+            ack({
+              error: err instanceof Error ? err.message : "internal_error",
+            });
           }
         }
       });
@@ -145,7 +147,8 @@ export function attachSocketServer(httpServer: HTTPServer) {
       try {
         if (typeof sessionId !== "string" || !sessionId.trim())
           throw new Error("bad_session");
-        if (typeof name !== "string" || !name.trim()) throw new Error("bad_name");
+        if (typeof name !== "string" || !name.trim())
+          throw new Error("bad_name");
         const safeName = name.trim().slice(0, 80);
 
         const session = await db.studioSession.findUnique({
@@ -217,11 +220,14 @@ export function attachSocketServer(httpServer: HTTPServer) {
       }
     };
 
-    socket.on("join", (payload: { sessionId?: unknown; name?: unknown }, ack?: Ack) => {
-      joinQueue = joinQueue.then(() =>
-        doJoin(payload ?? {}, typeof ack === "function" ? ack : undefined),
-      );
-    });
+    socket.on(
+      "join",
+      (payload: { sessionId?: unknown; name?: unknown }, ack?: Ack) => {
+        joinQueue = joinQueue.then(() =>
+          doJoin(payload ?? {}, typeof ack === "function" ? ack : undefined),
+        );
+      },
+    );
 
     // ── mediasoup signaling ────────────────────────────────────────────────
     on<{ direction?: unknown }>("ms:createTransport", async ({ direction }) => {
@@ -230,7 +236,8 @@ export function attachSocketServer(httpServer: HTTPServer) {
         throw new Error("bad_direction");
 
       // Replace any previous transport of the same direction.
-      const old = direction === "send" ? peer.sendTransport : peer.recvTransport;
+      const old =
+        direction === "send" ? peer.sendTransport : peer.recvTransport;
       if (old) {
         old.close();
         peer.transports.delete(old.id);
@@ -341,13 +348,18 @@ export function attachSocketServer(httpServer: HTTPServer) {
       },
     );
 
-    on<{ consumerId?: unknown }>("ms:resumeConsumer", async ({ consumerId }) => {
-      const { peer } = need();
-      const consumer =
-        typeof consumerId === "string" ? peer.consumers.get(consumerId) : null;
-      if (!consumer) throw new Error("consumer_not_found");
-      await consumer.resume();
-    });
+    on<{ consumerId?: unknown }>(
+      "ms:resumeConsumer",
+      async ({ consumerId }) => {
+        const { peer } = need();
+        const consumer =
+          typeof consumerId === "string"
+            ? peer.consumers.get(consumerId)
+            : null;
+        if (!consumer) throw new Error("consumer_not_found");
+        await consumer.resume();
+      },
+    );
 
     on<{ producerId?: unknown }>("ms:closeProducer", ({ producerId }) => {
       const { room, peer } = need();
@@ -358,7 +370,10 @@ export function attachSocketServer(httpServer: HTTPServer) {
       peer.producers.delete(producer.id);
       socket
         .to(room.id)
-        .emit("ms:producerClosed", { producerId: producer.id, socketId: socket.id });
+        .emit("ms:producerClosed", {
+          producerId: producer.id,
+          socketId: socket.id,
+        });
     });
 
     // ── chat ───────────────────────────────────────────────────────────────
@@ -391,7 +406,9 @@ export function attachSocketServer(httpServer: HTTPServer) {
     on<{ targetSocketId?: unknown }>("host:mute", ({ targetSocketId }) => {
       const { room } = needHost();
       const target =
-        typeof targetSocketId === "string" ? room.peers.get(targetSocketId) : null;
+        typeof targetSocketId === "string"
+          ? room.peers.get(targetSocketId)
+          : null;
       if (!target) return;
       // Enforced on the server: the mic stops forwarding to everyone.
       target.producers.forEach((p) => {
@@ -403,7 +420,9 @@ export function attachSocketServer(httpServer: HTTPServer) {
     on<{ targetSocketId?: unknown }>("host:remove", ({ targetSocketId }) => {
       const { room } = needHost();
       const target =
-        typeof targetSocketId === "string" ? room.peers.get(targetSocketId) : null;
+        typeof targetSocketId === "string"
+          ? room.peers.get(targetSocketId)
+          : null;
       if (!target || target.isHost) return;
       io.to(target.socketId).emit("host:removed", { targetSocketId });
       io.sockets.sockets.get(target.socketId)?.disconnect(true);
@@ -411,7 +430,8 @@ export function attachSocketServer(httpServer: HTTPServer) {
 
     on<{ layout?: unknown }>("host:layout", ({ layout }) => {
       const { room } = needHost();
-      if (layout !== "solo" && layout !== "grid" && layout !== "spotlight") return;
+      if (layout !== "solo" && layout !== "grid" && layout !== "spotlight")
+        return;
       room.layout = layout;
       io.in(room.id).emit("host:layout", { layout });
     });

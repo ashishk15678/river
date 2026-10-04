@@ -47,8 +47,18 @@ interface ConsumerEntry {
 // Three simulcast layers: the SFU forwards the best one each receiver's
 // network can handle.
 const CAM_ENCODINGS: mc.RtpEncodingParameters[] = [
-  { rid: "r0", maxBitrate: 150_000, scaleResolutionDownBy: 4, scalabilityMode: "L1T3" },
-  { rid: "r1", maxBitrate: 500_000, scaleResolutionDownBy: 2, scalabilityMode: "L1T3" },
+  {
+    rid: "r0",
+    maxBitrate: 150_000,
+    scaleResolutionDownBy: 4,
+    scalabilityMode: "L1T3",
+  },
+  {
+    rid: "r1",
+    maxBitrate: 500_000,
+    scaleResolutionDownBy: 2,
+    scalabilityMode: "L1T3",
+  },
   { rid: "r2", maxBitrate: 1_500_000, scalabilityMode: "L1T3" },
 ];
 
@@ -82,9 +92,10 @@ export function useStudioCall({
   const [error, setError] = useState<string | null>(null);
 
   const sendTransportRef = useRef<mc.Transport | null>(null);
-  const screenRef = useRef<{ producer: mc.Producer; track: MediaStreamTrack } | null>(
-    null,
-  );
+  const screenRef = useRef<{
+    producer: mc.Producer;
+    track: MediaStreamTrack;
+  } | null>(null);
   const onRemovedRef = useRef(onRemoved);
   useEffect(() => {
     onRemovedRef.current = onRemoved;
@@ -133,11 +144,15 @@ export function useStudioCall({
           ...info,
           stream: streamFor(
             `${info.socketId}:cam`,
-            entries.filter((e) => e.source !== "screen").map((e) => e.consumer.track),
+            entries
+              .filter((e) => e.source !== "screen")
+              .map((e) => e.consumer.track),
           ),
           screen: streamFor(
             `${info.socketId}:screen`,
-            entries.filter((e) => e.source === "screen").map((e) => e.consumer.track),
+            entries
+              .filter((e) => e.source === "screen")
+              .map((e) => e.consumer.track),
           ),
         };
       }
@@ -167,16 +182,19 @@ export function useStudioCall({
       });
 
       if (direction === "send") {
-        transport.on("produce", ({ kind, rtpParameters, appData }, callback, errback) => {
-          request<{ id: string }>(socket, "ms:produce", {
-            transportId: transport.id,
-            kind,
-            rtpParameters,
-            source: appData.source,
-          })
-            .then(({ id }) => callback({ id }))
-            .catch(errback);
-        });
+        transport.on(
+          "produce",
+          ({ kind, rtpParameters, appData }, callback, errback) => {
+            request<{ id: string }>(socket, "ms:produce", {
+              transportId: transport.id,
+              kind,
+              rtpParameters,
+              source: appData.source,
+            })
+              .then(({ id }) => callback({ id }))
+              .catch(errback);
+          },
+        );
       }
       return transport;
     };
@@ -219,7 +237,11 @@ export function useStudioCall({
         c.on("transportclose", () => {
           consumers.delete(c.id);
         });
-        consumers.set(c.id, { consumer: c, socketId: data.socketId, source: data.source });
+        consumers.set(c.id, {
+          consumer: c,
+          socketId: data.socketId,
+          source: data.source,
+        });
         await request(socket, "ms:resumeConsumer", { consumerId: c.id });
         publish();
       } catch (err) {
@@ -265,7 +287,9 @@ export function useStudioCall({
     };
 
     const onChat = (m: ChatMessage) =>
-      setMessages((prev) => (prev.some((x) => x.id === m.id) ? prev : [...prev, m]));
+      setMessages((prev) =>
+        prev.some((x) => x.id === m.id) ? prev : [...prev, m],
+      );
 
     const onLayout = ({ layout }: { layout: Layout }) => setLayout(layout);
 
@@ -335,7 +359,9 @@ export function useStudioCall({
       } catch (err) {
         if (cancelled) return;
         console.error("[studio] setup failed", err);
-        setError(err instanceof Error ? err.message : "Could not connect to studio");
+        setError(
+          err instanceof Error ? err.message : "Could not connect to studio",
+        );
       }
     })();
 
@@ -378,7 +404,9 @@ export function useStudioCall({
     const transport = sendTransportRef.current;
     if (!transport) return;
     try {
-      const display = await navigator.mediaDevices.getDisplayMedia({ video: true });
+      const display = await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+      });
       const track = display.getVideoTracks()[0];
       const producer = await transport.produce({
         track,
