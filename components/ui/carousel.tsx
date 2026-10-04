@@ -44,7 +44,9 @@ function useCarousel() {
 }
 
 function Carousel({
-  orientation = "horizontal",
+  // Derive default orientation from opts.axis when orientation is not
+  // explicitly supplied, so opts={{ axis: "y" }} isn't silently overridden.
+  orientation = opts?.axis === "y" ? "vertical" : "horizontal",
   opts,
   setApi,
   plugins,
@@ -78,15 +80,24 @@ function Carousel({
 
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
-      if (event.key === "ArrowLeft") {
+      // Don't steal keys from text inputs or other editable descendants.
+      const tag = (event.target as HTMLElement).tagName;
+      const editable = (event.target as HTMLElement).isContentEditable;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || editable)
+        return;
+
+      const prevKey = orientation === "vertical" ? "ArrowUp" : "ArrowLeft";
+      const nextKey = orientation === "vertical" ? "ArrowDown" : "ArrowRight";
+
+      if (event.key === prevKey) {
         event.preventDefault();
         scrollPrev();
-      } else if (event.key === "ArrowRight") {
+      } else if (event.key === nextKey) {
         event.preventDefault();
         scrollNext();
       }
     },
-    [scrollPrev, scrollNext],
+    [orientation, scrollPrev, scrollNext],
   );
 
   React.useEffect(() => {
@@ -101,6 +112,7 @@ function Carousel({
     api.on("select", onSelect);
 
     return () => {
+      api?.off("reInit", onSelect);
       api?.off("select", onSelect);
     };
   }, [api, onSelect]);
@@ -111,8 +123,7 @@ function Carousel({
         carouselRef,
         api: api,
         opts,
-        orientation:
-          orientation || (opts?.axis === "y" ? "vertical" : "horizontal"),
+        orientation,
         scrollPrev,
         scrollNext,
         canScrollPrev,

@@ -30,7 +30,7 @@ export default function Home() {
           the fly, and record — no downloads required.
         </p>
         <Link
-          href="/login"
+          href="/auth"
           className="mt-8 px-6 py-3 rounded-md bg-brand text-white font-medium hover:bg-brand-light"
         >
           Create your studio
